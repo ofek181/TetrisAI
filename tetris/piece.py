@@ -32,6 +32,8 @@ class Piece:
          Constructs all the necessary attributes for the Piece object.
         rotate(self):
          Rotates the piece.
+        decode_shape(self):
+         Decodes the encoded positions into actual x,y positions.
     """
 
     def __init__(self, x_pos: int, y_pos: int, idx: int) -> None:
