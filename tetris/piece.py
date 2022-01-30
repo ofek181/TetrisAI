@@ -40,9 +40,15 @@ class Piece:
         """
         self.x = x_pos
         self.y = y_pos
-        self.shape = PieceConsts.shapes[idx]
+
+        try:
+            self.shape = PieceConsts.shapes[idx]
+            self.color = PieceConsts.colors[idx]
+        except IndexError:
+            print("Shape index must be between 0 - 6")
+            exit(1)
+
         self.rotation = 0
-        self.color = PieceConsts.colors[idx]
 
     def rotate(self):
         """
@@ -51,11 +57,20 @@ class Piece:
         self.rotation = (self.rotation + 1) % len(self.shape)
 
     def decode_shape(self):
+        """
+            Decodes the encoded piece's shape from the consts file into actual positions on screen.
+        """
         encoded_shape = self.shape[self.rotation]
         positions = []
+        x_offset, y_offset = 2, 4
 
         for column_idx, column in enumerate(encoded_shape):
             values = list[column]
-            for row_idx, row in enumerate(values):
+            for row_idx, row in enumerate(column):
                 if row == '0':
                     positions.append((self.x + row_idx, self.y + column_idx))
+
+        for i, val in enumerate(positions):
+            positions[i] = val[0] - x_offset, val[1] - y_offset
+
+        return positions
