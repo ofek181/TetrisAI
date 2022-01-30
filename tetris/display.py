@@ -35,13 +35,19 @@ class Display:
         """
         pass
 
-    def draw_objects(self, piece: Piece, next_piece: Piece, score: int):
+    def display_score(self, score: int):
+        """
+            Displays the current game score.
+        """
+        pass
+
+    def draw_screen(self, piece: Piece, next_piece: Piece, score: int):
         """
             Implements the animation of the falling piece.
                 Parameters:
                     piece : current piece played.
-                    score: score of left player.
                     next_piece: upcoming piece.
+                    score: score of left player.
         """
         pass
 
