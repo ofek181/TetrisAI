@@ -1,5 +1,9 @@
 from enum import Enum
 
+# class AudioConsts:
+#     HIT_AUDIO = os.path.join(local_dir_audio, 'hit.wav')
+#     SCORE_AUDIO = os.path.join(local_dir_audio, 'score.wav')
+
 
 class DisplayConsts:
     FPS = 30
@@ -13,9 +17,20 @@ class DisplayConsts:
     FONT_TYPE = '8-Bit-Madness'
 
 
-# class AudioConsts:
-#     HIT_AUDIO = os.path.join(local_dir_audio, 'hit.wav')
-#     SCORE_AUDIO = os.path.join(local_dir_audio, 'score.wav')
+class GameConsts:
+    MAX_SCORE = 1000000
+    GRID_WIDTH = 10
+    GRID_HEIGHT = 20
+    GRID_COLOR = (0, 0, 0)
+
+
+class Action(Enum):
+    NO_ACTION = 0
+    MOVE_UP = 1
+    MOVE_DOWN = 2
+    MOVE_LEFT = 3
+    MOVE_RIGHT = 4
+    QUIT = 9
 
 
 class PieceConsts:
@@ -133,19 +148,6 @@ class PieceConsts:
 
     shapes = [S, Z, I, O, J, L, T]
     colors = [GREEN, RED, CYAN, YELLOW, BLUE, ORANGE, PURPLE]
-
-
-class GameConsts:
-    MAX_SCORE = 1000000
-
-
-class Action(Enum):
-    NO_ACTION = 0
-    MOVE_UP = 1
-    MOVE_DOWN = 2
-    MOVE_LEFT = 3
-    MOVE_RIGHT = 4
-    QUIT = 9
 
 
 
