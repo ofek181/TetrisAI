@@ -78,3 +78,26 @@ class Logic:
                     if (next_x, next_y) in self.taken_positions:
                         self.taken_positions[(next_x, next_y - 1)] = self.taken_positions[(next_x, next_y)]
                         del self.taken_positions[(next_x, next_y)]
+
+    def is_game_over(self):
+        """
+            checks if the game is over.
+        """
+        pass
+
+    def is_valid_rotation(self):
+        """
+            checks if you can rotate the piece.
+        """
+        pass
+
+    def is_collision(self):
+        """
+            checks for collisions, piece to stationary pieces.
+        """
+        pass
+
+    def update_score(self):
+        """
+            updates the score of the game.
+        """
