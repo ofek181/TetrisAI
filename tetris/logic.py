@@ -45,10 +45,16 @@ class Logic:
             for row in range(len(self.grid[column])):
                 if (row, column) in self.taken_positions:
                     color = self.taken_positions[(row, column)]
-                    self.grid[row][column] = color
+                    self.grid[column][row] = color
 
-    def is_column_cleared(self):
-        pass
-
-
-
+    def is_row_cleared(self):
+        counter = 0
+        cleared_rows = []
+        for column in range(len(self.grid)):
+            for row in range(len(self.grid[column])):
+                if (row, column) in self.taken_positions:
+                    counter += 1
+                    if counter == len(self.grid[row]):
+                        cleared_rows.append(column)
+            counter = 0
+        return cleared_rows

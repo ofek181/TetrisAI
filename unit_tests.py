@@ -21,12 +21,16 @@ def test():
     # Logic object Tests
     # __________________________________________________
     logic = Logic()
-    print(logic.grid)
-    print(len(logic.grid))
-    print(len(logic.grid[0]))
-    logic.taken_positions[(0, 0)] = (255, 255, 255)
+    # print(logic.grid)
+    # print(len(logic.grid[3]))
+    # print(len(logic.grid[:][:]))
+    # print(len(logic.grid[0]))
+    for i in range(10):
+        logic.taken_positions[(i, 3)] = (255, 255, 255)
+        logic.taken_positions[(i, 5)] = (200, 5, 5)
     logic.update_grid()
-    print(logic.grid)
+    # print(logic.grid[:][3])
+    print(logic.is_row_cleared())
 
 
 if __name__ == '__main__':
