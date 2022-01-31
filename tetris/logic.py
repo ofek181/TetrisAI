@@ -28,33 +28,53 @@ class Logic:
          Decodes the encoded positions into actual x,y positions.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         """
             Constructs all the necessary attributes for the Piece object.
         """
-        self.grid = [[GameConsts.GRID_COLOR for _ in range(GameConsts.GRID_WIDTH)]
-                     for _ in range(GameConsts.GRID_HEIGHT)]
+        self.grid = [[GameConsts.GRID_COLOR for x in range(GameConsts.GRID_WIDTH)]
+                     for y in range(GameConsts.GRID_HEIGHT)]
         self.taken_positions = {}
 
-    def update_grid(self):
+    def update_grid(self) -> None:
         """
             creates the tetris puzzle grid.
             for every row and column, check if the position is taken already and input the piece color into the grid.
         """
-        for column in range(len(self.grid)):
-            for row in range(len(self.grid[column])):
-                if (row, column) in self.taken_positions:
-                    color = self.taken_positions[(row, column)]
-                    self.grid[column][row] = color
+        for y in range(len(self.grid)):
+            for x in range(len(self.grid[y])):
+                if (x, y) in self.taken_positions:
+                    color = self.taken_positions[(x, y)]
+                    self.grid[y][x] = color
+                else:
+                    self.grid[y][x] = GameConsts.GRID_COLOR
 
-    def is_row_cleared(self):
+    def is_row_filled(self) -> list:
+        """
+            checks for if the entire row is filled so the tetris game can clear it.
+        """
         counter = 0
-        cleared_rows = []
-        for column in range(len(self.grid)):
-            for row in range(len(self.grid[column])):
-                if (row, column) in self.taken_positions:
+        filled_rows = []
+        for y in range(len(self.grid)):
+            for x in range(len(self.grid[y])):
+                if (x, y) in self.taken_positions:
                     counter += 1
-                    if counter == len(self.grid[row]):
-                        cleared_rows.append(column)
+                    if counter == len(self.grid[x]):
+                        filled_rows.append(y)
             counter = 0
-        return cleared_rows
+        return filled_rows
+
+    def clear_filled_rows(self, filled_rows: list) -> None:
+        """
+            clear a row if the said row is already filled.
+            take down all following rows by 1 for each deleted row
+        """
+        filled_rows.sort(reverse=True)
+        for y in filled_rows:
+            for x in range(len(self.grid[y])):
+                del self.taken_positions[(x, y)]
+            for next_y in range(y + 1, len(self.grid)):
+                for next_x in range(len(self.grid[next_y])):
+                    if (next_x, next_y) in self.taken_positions:
+                        self.taken_positions[(next_x, next_y - 1)] = self.taken_positions[(next_x, next_y)]
+                        del self.taken_positions[(next_x, next_y)]
