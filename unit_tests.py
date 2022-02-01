@@ -53,17 +53,16 @@ def test():
     display = Display()
     screen = Screen()
     piece1 = Piece(5, 5, 6)
-    piece2 = Piece(3, 3, 2)
+    piece2 = Piece(3, 3, 4)
     positions1 = piece1.decode_shape()
     positions2 = piece2.decode_shape()
+    score = 200
     for pos in positions1:
         screen.taken_positions[pos] = piece1.color
     screen.update_grid()
     while 1:
-        display.draw_grid(screen.grid)
-        display.display_next_piece(positions2, piece2.color)
-        display.display_score(1000)
-        pygame.display.update()
+        display.draw_screen(screen.grid, positions2, piece2.color, score)
+
 
 
 if __name__ == '__main__':

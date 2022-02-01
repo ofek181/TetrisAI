@@ -15,12 +15,14 @@ class Display:
         ----------------------------
         __init__(self):
          Constructs all the necessary attributes for the Display object.
-        display_next_piece(self, piece):
-         Displays the upcoming shape.
+        draw_grid(grid):
+         Draws the tetris' grid.
+        display_next_piece(self, positions, color):
+         Displays the upcoming piece.
         display_score(self, score):
          Displays the score of the game.
-        draw_screen(self, piece, next_piece, score):
-         Uses pygame methods in order to display the ball and paddles.
+        draw_screen(self, grid, positions, color, score):
+         Displays a single frame of the game.
     """
     def __init__(self) -> None:
         """
@@ -79,21 +81,22 @@ class Display:
             Displays the current game score.
         """
         font = pygame.font.SysFont(DisplayConsts.FONT, DisplayConsts.FONT_SIZE)
-        txt =  font.render('Score: ', True, DisplayConsts.FONT_COLOR)
+        txt = font.render('Score: ', True, DisplayConsts.FONT_COLOR)
         scr = font.render(str(score), True, DisplayConsts.FONT_COLOR)
         top_left_x = int(DisplayConsts.TOP_LEFT_X + DisplayConsts.PLAY_WIDTH * 1.2)
-        top_left_y = int(DisplayConsts.TOP_LEFT_Y * 8)
+        top_left_y = int(DisplayConsts.TOP_LEFT_Y * 5)
         self.window.blit(txt, (top_left_x, top_left_y))
         self.window.blit(scr, (top_left_x + 100, top_left_y))
 
-    def draw_screen(self, piece, next_piece, score: int):
+    def draw_screen(self, grid: list, positions: list, color: tuple, score: int) -> None:
         """
-            Implements the animation of the falling piece.
-                Parameters:
-                    piece : current piece played.
-                    next_piece: upcoming piece.
-                    score: score of left player.
+            Implements a frame of the game.
         """
-        pass
+        self.draw_grid(grid)
+        self.display_next_piece(positions, color)
+        self.display_score(score)
+
+        pygame.time.Clock().tick(DisplayConsts.FPS)
+        pygame.display.update()
 
 

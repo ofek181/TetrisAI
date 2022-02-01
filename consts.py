@@ -15,7 +15,7 @@ class DisplayConsts:
     GRID_COLOR = (200, 200, 200)
     FONT = 'comicsans'
     FONT_SIZE = 30
-    FONT_COLOR = (255, 255, 255)
+    FONT_COLOR = (220, 220, 220)
 
 
 class GameConsts:
