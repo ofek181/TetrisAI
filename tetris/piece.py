@@ -66,11 +66,10 @@ class Piece:
         positions = []
         x_offset, y_offset = 2, 4
 
-        for column_idx, column in enumerate(encoded_shape):
-            values = list[column]
-            for row_idx, row in enumerate(column):
-                if row == '0':
-                    positions.append((self.x + row_idx, self.y + column_idx))
+        for y_idx, y in enumerate(encoded_shape):
+            for x_idx, x in enumerate(y):
+                if x == '0':
+                    positions.append((self.x + x_idx, self.y + y_idx))
 
         for i, val in enumerate(positions):
             positions[i] = val[0] - x_offset, val[1] - y_offset

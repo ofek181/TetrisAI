@@ -21,7 +21,7 @@ def test():
     # Logic object Tests
     # __________________________________________________
     logic = Logic()
-    # print(logic.grid)
+    print(logic.grid)
     # print(len(logic.grid[3]))
     # print(len(logic.grid[:][:]))
     # print(len(logic.grid[0]))
@@ -32,12 +32,13 @@ def test():
     logic.taken_positions[(1, 1)] = (2, 2, 2)
     logic.taken_positions[(0, 3)] = (3, 3, 3)
     logic.update_grid()
+    print(logic.taken_positions)
     print(logic.grid)
-    filled_rows = logic.is_row_filled()
-    logic.clear_filled_rows(filled_rows)
-    print(logic.grid)
-    logic.update_grid()
-    print(logic.grid)
+    # filled_rows = logic.is_row_filled()
+    # logic.clear_filled_rows(filled_rows)
+    # print(logic.grid)
+    # logic.update_grid()
+    # print(logic.grid)
 
 
 
