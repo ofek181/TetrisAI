@@ -36,7 +36,7 @@ class Screen:
         """
             Constructs all the necessary attributes for the Piece object.
         """
-        self.grid = [[GameConsts.GRID_COLOR for x in range(GameConsts.GRID_WIDTH)]
+        self.grid = [[GameConsts.GRID_FILL for x in range(GameConsts.GRID_WIDTH)]
                      for y in range(GameConsts.GRID_HEIGHT)]
         self.taken_positions = {}
 
@@ -51,7 +51,7 @@ class Screen:
                     color = self.taken_positions[(x, y)]
                     self.grid[y][x] = color
                 else:
-                    self.grid[y][x] = GameConsts.GRID_COLOR
+                    self.grid[y][x] = GameConsts.GRID_FILL
 
     def is_row_filled(self) -> list:
         """
@@ -97,7 +97,7 @@ class Screen:
         """
             checks if you can rotate the piece.
         """
-        valid = [[(x, y) for x in range(GameConsts.GRID_WIDTH) if self.grid[y][x] == GameConsts.GRID_COLOR]
+        valid = [[(x, y) for x in range(GameConsts.GRID_WIDTH) if self.grid[y][x] == GameConsts.GRID_FILL]
                  for y in range(GameConsts.GRID_HEIGHT)]
         flatten_valid = [item for sublist in valid for item in sublist]
         for loc in positions:
