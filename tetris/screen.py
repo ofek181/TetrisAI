@@ -89,7 +89,7 @@ class Screen:
                 return True
         return False
 
-    def is_valid_rotation(self, positions):
+    def is_valid_rotation(self, positions: list) -> bool:
         """
             checks if you can rotate the piece.
         """
@@ -102,13 +102,24 @@ class Screen:
                     return False
         return True
 
-    def is_collision(self):
+    def is_collision(self, position: list, color: tuple) -> bool:
         """
-            checks for collisions, piece to stationary pieces.
+            checks for collisions, and adds the piece to taken_positions if a collision occurred.
         """
-        pass
+        for loc in position:
+            if (loc[0], loc[1]+1) in self.taken_positions:
+                self.taken_positions[loc] = color
+                return True
+        return False
 
-    def update_score(self):
+    @staticmethod
+    def update_score(n: int):
         """
             updates the score of the game.
+            40 - 1 line
+            100 - 2 lines
+            300 - 3 lines
+            1200 - 4 lines
         """
+        score = {0: 0, 1: 40, 2: 100, 3: 300, 4: 1200}
+        return score[n]
