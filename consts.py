@@ -1,5 +1,3 @@
-from enum import Enum
-
 # class AudioConsts:
 #     HIT_AUDIO = os.path.join(local_dir_audio, 'hit.wav')
 #     SCORE_AUDIO = os.path.join(local_dir_audio, 'score.wav')
@@ -24,18 +22,8 @@ class GameConsts:
     GRID_COLOR = (0, 0, 0)
 
 
-class Action(Enum):
-    NO_ACTION = 0
-    MOVE_UP = 1
-    MOVE_DOWN = 2
-    MOVE_LEFT = 3
-    MOVE_RIGHT = 4
-    QUIT = 9
-
-
 class PieceConsts:
     PIECE_SIZE = 10
-
     GREEN = (0, 255, 0)
     RED = (255, 0, 0)
     CYAN = (0, 255, 255)
