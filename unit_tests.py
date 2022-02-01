@@ -1,5 +1,5 @@
 from tetris.piece import Piece
-from tetris.logic import Logic
+from tetris.screen import Screen
 
 
 def test():
@@ -20,7 +20,7 @@ def test():
     # __________________________________________________
     # Logic object Tests
     # __________________________________________________
-    logic = Logic()
+    logic = Screen()
     print(logic.grid)
     # print(len(logic.grid[3]))
     # print(len(logic.grid[:][:]))

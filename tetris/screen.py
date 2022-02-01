@@ -1,7 +1,7 @@
 from consts import GameConsts
 
 
-class Logic:
+class Screen:
     """
         A class to implement the logic object with respect to tetris' rule system.
         ----------------------------
@@ -79,17 +79,28 @@ class Logic:
                         self.taken_positions[(next_x, next_y - 1)] = self.taken_positions[(next_x, next_y)]
                         del self.taken_positions[(next_x, next_y)]
 
-    def is_game_over(self):
+    def is_game_over(self) -> bool:
         """
             checks if the game is over.
         """
-        pass
+        for position in self.taken_positions:
+            x, y = position
+            if y <= 0:
+                return True
+        return False
 
-    def is_valid_rotation(self):
+    def is_valid_rotation(self, positions):
         """
             checks if you can rotate the piece.
         """
-        pass
+        valid = [[(x, y) for x in range(GameConsts.GRID_WIDTH) if self.grid[y][x] == GameConsts.GRID_COLOR]
+                 for y in range(GameConsts.GRID_HEIGHT)]
+        flatten_valid = [item for sublist in valid for item in sublist]
+        for loc in positions:
+            if loc not in flatten_valid:
+                if loc[1] >= 0:
+                    return False
+        return True
 
     def is_collision(self):
         """
