@@ -52,13 +52,13 @@ class Piece:
 
         self.rotation = 0
 
-    def rotate(self):
+    def rotate(self) -> None:
         """
             Rotates the piece by increasing the rotation index by 1 % the amount of variations the shape has.
         """
         self.rotation = (self.rotation + 1) % len(self.shape)
 
-    def decode_shape(self):
+    def decode_shape(self) -> list:
         """
             Decodes the encoded piece's shape from the consts file into actual positions on screen.
         """
