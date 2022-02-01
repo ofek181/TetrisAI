@@ -5,21 +5,27 @@
 
 class DisplayConsts:
     FPS = 30
-    SCREEN_WIDTH = 500
+    SCREEN_WIDTH = 600
     SCREEN_HEIGHT = 600
-    FONT_COLOR = (255, 255, 255)
-    LINE_FONT = (50, 50, 50)
-    LINE_WIDTH = 10
-    FONT_SIZE = 80
-    WINNER_SIZE = 90
-    FONT_TYPE = '8-Bit-Madness'
+    PLAY_WIDTH = 250
+    PLAY_HEIGHT = PLAY_WIDTH * 2
+    BLOCK_SIZE = PLAY_WIDTH / 10
+    TOP_LEFT_X = (SCREEN_WIDTH - PLAY_WIDTH) // 8
+    TOP_LEFT_Y = (SCREEN_HEIGHT - PLAY_HEIGHT) // 2
+    GRID_COLOR = (200, 200, 200)
+    # FONT_COLOR = (255, 255, 255)
+    # LINE_FONT = (50, 50, 50)
+    # LINE_WIDTH = 10
+    # FONT_SIZE = 80
+    # WINNER_SIZE = 90
+    # FONT_TYPE = '8-Bit-Madness'
 
 
 class GameConsts:
     MAX_SCORE = 1000000
     GRID_WIDTH = 10
     GRID_HEIGHT = 20
-    GRID_COLOR = (0, 0, 0)
+    GRID_FILL = (20, 20, 20)
 
 
 class PieceConsts:

@@ -1,10 +1,11 @@
 from tetris.piece import Piece
 from tetris.screen import Screen
+from tetris.display import Display
 
 
 def test():
     # __________________________________________________
-    # Piece object Tests
+    # Piece Tests
     # __________________________________________________
     # piece1 = Piece(100, 200, 0)
     # for _ in range(3):
@@ -20,10 +21,10 @@ def test():
     # tmp = piece1.decode_shape()
     # print(tmp)
     # __________________________________________________
-    # Logic object Tests
+    # Logic Tests
     # __________________________________________________
-    logic = Screen()
-    piece = Piece(0, 2, 3)
+    # logic = Screen()
+    # piece = Piece(0, 2, 3)
     # print(logic.grid)
     # print(len(logic.grid[3]))
     # print(len(logic.grid[:][:]))
@@ -31,20 +32,31 @@ def test():
     # for i in range(10):
     #     logic.taken_positions[(i, 0)] = (255, 255, 255)
     #     logic.taken_positions[(i, 2)] = (200, 5, 5)
-    logic.taken_positions[(0, 1)] = (1, 1, 1)
-    logic.taken_positions[(1, 1)] = (2, 2, 2)
-    # logic.taken_positions[(0, 3)] = (3, 3, 3)
-    logic.update_grid()
-    print(logic.taken_positions)
-    pos = piece.decode_shape()
-    print(logic.is_collision(pos, piece.color))
-    print(logic.taken_positions)
+    # logic.taken_positions[(0, 1)] = (1, 1, 1)
+    # logic.taken_positions[(1, 1)] = (2, 2, 2)
+    # # logic.taken_positions[(0, 3)] = (3, 3, 3)
+    # logic.update_grid()
+    # print(logic.taken_positions)
+    # pos = piece.decode_shape()
+    # print(logic.is_collision(pos, piece.color))
+    # print(logic.taken_positions)
     # print(logic.grid)
     # filled_rows = logic.is_row_filled()
     # logic.clear_filled_rows(filled_rows)
     # print(logic.grid)
     # logic.update_grid()
     # print(logic.grid)
+    # __________________________________________________
+    # Display Tests
+    # __________________________________________________
+    display = Display()
+    screen = Screen()
+    piece = Piece(0, 0, 0)
+    positions = piece.decode_shape()
+    for pos in positions:
+        screen.taken_positions[pos] = piece.color
+    while 1:
+        display.draw_grid(screen.grid)
 
 
 if __name__ == '__main__':
