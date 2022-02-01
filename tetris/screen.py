@@ -3,29 +3,33 @@ from consts import GameConsts
 
 class Screen:
     """
-        A class to implement the logic object with respect to tetris' rule system.
+        A class to implement the screen object with respect to tetris' rule system.
         ----------------------------
         Attributes
         ----------------------------
-        x_pos: int
-         x position of the piece
-        y_pos: int
-         y position of the piece
-        shape: list
-         a list containing all the shapes and rotations of the piece objects.
-        rotation: int
-         current rotation of the piece, affecting the shape of it. between 0-3.
-        color: list
-         a list containing the colors of the different shapes according to the tetris color scheme.
+        grid: list
+         2dim list representing the tetris grid
+        taken positions: dictionary
+         dict representing all the taken tetris positions and their colors (eg. (1, 1) = (255, 255, 255))
         ----------------------------
         Methods
         ----------------------------
-        __init__(self, x_pos, y_pos, idx):
+        __init__(self):
          Constructs all the necessary attributes for the Piece object.
-        rotate(self):
-         Rotates the piece.
-        decode_shape(self):
-         Decodes the encoded positions into actual x,y positions.
+        update_grid(self):
+         Updates the tetris puzzle grid.
+        is_row_filled(self):
+         Checks if an entire row is filled.
+        clear_filled_rows(self, filled_rows):
+         clears filled rows.
+        is_game_over(self):
+         Checks if a player lost.
+        is_valid_rotation(self, positions):
+         Checks if you can rotate the piece in the current position it is in.
+        is_collision(self, position, color):
+         Checks if a collision occurred and adds the collided piece to the taken positions dict.
+        update_score(n):
+         Updates the game's score according to tetris' scoring system.
     """
 
     def __init__(self) -> None:
@@ -38,7 +42,7 @@ class Screen:
 
     def update_grid(self) -> None:
         """
-            creates the tetris puzzle grid.
+            updates the tetris puzzle grid.
             for every row and column, check if the position is taken already and input the piece color into the grid.
         """
         for y in range(len(self.grid)):
@@ -51,7 +55,7 @@ class Screen:
 
     def is_row_filled(self) -> list:
         """
-            checks for if the entire row is filled so the tetris game can clear it.
+            checks if an entire row is filled so the tetris game can clear it.
         """
         counter = 0
         filled_rows = []
