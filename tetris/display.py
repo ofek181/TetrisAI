@@ -53,19 +53,38 @@ class Display:
                              (top_left_x + x * block_size, top_left_y),
                              (top_left_x + x * block_size, top_left_y + height))
 
-        pygame.display.update()
-
-    def display_next_piece(self, piece):
+    def display_next_piece(self, positions: list, color: tuple):
         """
             Displays the upcoming shape.
         """
-        pass
+        font = pygame.font.SysFont(DisplayConsts.FONT, DisplayConsts.FONT_SIZE)
+        label = font.render('Next Shape:', True, DisplayConsts.FONT_COLOR)
+        top_left_x = int(DisplayConsts.TOP_LEFT_X + DisplayConsts.PLAY_WIDTH * 1.2)
+        top_left_y = DisplayConsts.TOP_LEFT_Y + DisplayConsts.FONT_SIZE * 2
+        bs = DisplayConsts.BLOCK_SIZE
+
+        for loc in positions:
+            pos_x = top_left_x + loc[0] * bs
+            pos_y = top_left_y + loc[1] * bs
+            pygame.draw.rect(self.window, color, (pos_x, pos_y, bs, bs), 0)
+            pygame.draw.line(self.window, DisplayConsts.GRID_COLOR, (pos_x, pos_y), (pos_x + bs, pos_y))
+            pygame.draw.line(self.window, DisplayConsts.GRID_COLOR, (pos_x, pos_y + bs), (pos_x + bs, pos_y + bs))
+            pygame.draw.line(self.window, DisplayConsts.GRID_COLOR, (pos_x, pos_y), (pos_x, pos_y + bs))
+            pygame.draw.line(self.window, DisplayConsts.GRID_COLOR, (pos_x + bs, pos_y), (pos_x + bs, pos_y + bs))
+
+        self.window.blit(label, (top_left_x, top_left_y - 2 * bs))
 
     def display_score(self, score: int):
         """
             Displays the current game score.
         """
-        pass
+        font = pygame.font.SysFont(DisplayConsts.FONT, DisplayConsts.FONT_SIZE)
+        txt =  font.render('Score: ', True, DisplayConsts.FONT_COLOR)
+        scr = font.render(str(score), True, DisplayConsts.FONT_COLOR)
+        top_left_x = int(DisplayConsts.TOP_LEFT_X + DisplayConsts.PLAY_WIDTH * 1.2)
+        top_left_y = int(DisplayConsts.TOP_LEFT_Y * 8)
+        self.window.blit(txt, (top_left_x, top_left_y))
+        self.window.blit(scr, (top_left_x + 100, top_left_y))
 
     def draw_screen(self, piece, next_piece, score: int):
         """

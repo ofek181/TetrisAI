@@ -9,16 +9,13 @@ class DisplayConsts:
     SCREEN_HEIGHT = 600
     PLAY_WIDTH = 250
     PLAY_HEIGHT = PLAY_WIDTH * 2
-    BLOCK_SIZE = PLAY_WIDTH / 10
+    BLOCK_SIZE = PLAY_WIDTH // 10
     TOP_LEFT_X = (SCREEN_WIDTH - PLAY_WIDTH) // 8
     TOP_LEFT_Y = (SCREEN_HEIGHT - PLAY_HEIGHT) // 2
     GRID_COLOR = (200, 200, 200)
-    # FONT_COLOR = (255, 255, 255)
-    # LINE_FONT = (50, 50, 50)
-    # LINE_WIDTH = 10
-    # FONT_SIZE = 80
-    # WINNER_SIZE = 90
-    # FONT_TYPE = '8-Bit-Madness'
+    FONT = 'comicsans'
+    FONT_SIZE = 30
+    FONT_COLOR = (255, 255, 255)
 
 
 class GameConsts:
