@@ -1,5 +1,4 @@
 from consts import PieceConsts
-from random import choice
 
 
 class Piece:
@@ -58,13 +57,6 @@ class Piece:
             Rotates the piece by increasing the rotation index by 1 % the amount of variations the shape has.
         """
         self.rotation = (self.rotation + 1) % len(self.shape)
-
-    @staticmethod
-    def get_random_shape():
-        """
-            randoms a choice from all the different shapes with equal probabilities.
-        """
-        return choice(PieceConsts.shapes)
 
     def decode_shape(self):
         """
