@@ -139,11 +139,11 @@ class Screen:
         local_dir = os.path.dirname(__file__)
         config_path = os.path.join(local_dir, 'highscore.txt')
 
-        with open(local_dir, 'r') as file:
+        with open(config_path, 'r') as file:
             lines = file.readlines()
             highest_score = int(lines[0].strip())
 
-        with open(local_dir, 'w') as file:
+        with open(config_path, 'w') as file:
             if score > highest_score:
                 file.write(str(score))
             else:
