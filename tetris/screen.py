@@ -1,3 +1,4 @@
+import os
 from consts import GameConsts
 
 
@@ -28,8 +29,10 @@ class Screen:
          Checks if you can rotate the piece in the current position it is in.
         is_collision(self, position, color):
          Checks if a collision occurred and adds the collided piece to the taken positions dict.
-        update_score(n):
+        get_score(n):
          Updates the game's score according to tetris' scoring system.
+        update_highest_score(score):
+         Writes the highest score to a file.
     """
 
     def __init__(self) -> None:
@@ -117,9 +120,9 @@ class Screen:
         return False
 
     @staticmethod
-    def update_score(n: int):
+    def get_score(n: int):
         """
-            updates the score of the game.
+            Updates the score of the game.
             40 - 1 line
             100 - 2 lines
             300 - 3 lines
@@ -127,3 +130,21 @@ class Screen:
         """
         score = {0: 0, 1: 40, 2: 100, 3: 300, 4: 1200}
         return score[n]
+
+    @staticmethod
+    def update_highest_score(score: int):
+        """
+             Writes the highest score to a file.
+        """
+        local_dir = os.path.dirname(__file__)
+        config_path = os.path.join(local_dir, 'highscore.txt')
+
+        with open(local_dir, 'r') as file:
+            lines = file.readlines()
+            highest_score = int(lines[0].strip())
+
+        with open(local_dir, 'w') as file:
+            if score > highest_score:
+                file.write(str(score))
+            else:
+                file.write(str(highest_score))
