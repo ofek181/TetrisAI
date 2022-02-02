@@ -32,6 +32,8 @@ class Piece:
          Constructs all the necessary attributes for the Piece object.
         rotate(self):
          Rotates the piece.
+        unrotate(self):
+         Unrotates the piece.
         decode_shape(self):
          Decodes the encoded positions into actual x,y positions.
     """
@@ -57,6 +59,12 @@ class Piece:
             Rotates the piece by increasing the rotation index by 1 % the amount of variations the shape has.
         """
         self.rotation = (self.rotation + 1) % len(self.shape)
+
+    def unrotate(self) -> None:
+        """
+            Unrotates the piece
+        """
+        self.rotation = (self.rotation - 1) % len(self.shape)
 
     def decode_shape(self) -> list:
         """
