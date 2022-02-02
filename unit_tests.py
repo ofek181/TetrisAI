@@ -1,6 +1,7 @@
 from tetris.piece import Piece
 from tetris.screen import Screen
 from tetris.display import Display
+from tetris.game import Game
 import pygame
 
 
@@ -50,19 +51,23 @@ def test():
     # __________________________________________________
     # Display Tests
     # __________________________________________________
-    display = Display()
-    screen = Screen()
-    piece1 = Piece(5, 5, 6)
-    piece2 = Piece(3, 3, 4)
-    positions1 = piece1.decode_shape()
-    positions2 = piece2.decode_shape()
-    score = 200
-    for pos in positions1:
-        screen.taken_positions[pos] = piece1.color
-    screen.update_grid()
-    while 1:
-        display.draw_screen(screen.grid, positions2, piece2.color, score)
-
+    # display = Display()
+    # screen = Screen()
+    # piece1 = Piece(5, 5, 6)
+    # piece2 = Piece(3, 3, 4)
+    # positions1 = piece1.decode_shape()
+    # positions2 = piece2.decode_shape()
+    # score = 200
+    # for pos in positions1:
+    #     screen.taken_positions[pos] = piece1.color
+    # screen.update_grid()
+    # while 1:
+    #     display.draw_screen(screen.grid, positions2, piece2.color, score)
+    # __________________________________________________
+    # Game Tests
+    # __________________________________________________
+    game = Game()
+    game.play()
 
 
 if __name__ == '__main__':

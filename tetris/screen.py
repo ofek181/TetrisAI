@@ -48,13 +48,14 @@ class Screen:
             updates the tetris puzzle grid.
             for every row and column, check if the position is taken already and input the piece color into the grid.
         """
+        self.grid = [[GameConsts.GRID_FILL for x in range(GameConsts.GRID_WIDTH)]
+                     for y in range(GameConsts.GRID_HEIGHT)]
+
         for y in range(len(self.grid)):
             for x in range(len(self.grid[y])):
                 if (x, y) in self.taken_positions:
                     color = self.taken_positions[(x, y)]
                     self.grid[y][x] = color
-                else:
-                    self.grid[y][x] = GameConsts.GRID_FILL
 
     def is_row_filled(self) -> list:
         """
@@ -80,11 +81,10 @@ class Screen:
         for y in filled_rows:
             for x in range(len(self.grid[y])):
                 del self.taken_positions[(x, y)]
-            for next_y in range(y + 1, len(self.grid)):
+            for next_y in range(y - 1, 0, -1):
                 for next_x in range(len(self.grid[next_y])):
                     if (next_x, next_y) in self.taken_positions:
-                        self.taken_positions[(next_x, next_y - 1)] = self.taken_positions[(next_x, next_y)]
-                        del self.taken_positions[(next_x, next_y)]
+                        self.taken_positions[(next_x, next_y + 1)] = self.taken_positions.pop((next_x, next_y))
 
     def is_game_over(self) -> bool:
         """
@@ -109,6 +109,7 @@ class Screen:
                     return False
         return True
 
+    # TODO make sure we need this function
     def is_collision(self, position: list, color: tuple) -> bool:
         """
             checks for collisions, and adds the piece to taken_positions if a collision occurred.

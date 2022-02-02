@@ -4,7 +4,7 @@
 
 
 class DisplayConsts:
-    FPS = 30
+    FPS = 60
     SCREEN_WIDTH = 600
     SCREEN_HEIGHT = 600
     PLAY_WIDTH = 250
@@ -19,10 +19,13 @@ class DisplayConsts:
 
 
 class GameConsts:
-    MAX_SCORE = 1000000
     GRID_WIDTH = 10
     GRID_HEIGHT = 20
     GRID_FILL = (20, 20, 20)
+    STARTING_SPEED = 400
+    TIME = 4000
+    MAX_SPEED = 50
+    INC = 1
 
 
 class PieceConsts:
