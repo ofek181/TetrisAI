@@ -109,17 +109,6 @@ class Screen:
                     return False
         return True
 
-    # TODO make sure we need this function
-    def is_collision(self, position: list, color: tuple) -> bool:
-        """
-            checks for collisions, and adds the piece to taken_positions if a collision occurred.
-        """
-        for loc in position:
-            if (loc[0], loc[1]+1) in self.taken_positions:
-                self.taken_positions[loc] = color
-                return True
-        return False
-
     @staticmethod
     def get_score(n: int):
         """
