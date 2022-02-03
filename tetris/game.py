@@ -26,7 +26,7 @@ class Game(ABCGame):
              /////////////////////////////////////////
         """
 
-    def __init__(self) -> None:
+    def __init__(self, is_player_human: bool = True) -> None:
         """
             Constructs all the necessary attributes for the Game object.
         """
@@ -34,9 +34,7 @@ class Game(ABCGame):
         self.screen = Screen()
         self.current_shape_idx, self.next_shape_idx = random.randint(0, 6), random.randint(0, 6)
         self.score = 0
-
-    def _is_game_over(self):
-        pass
+        self.is_player_human = is_player_human
 
     def play(self):
         current_piece = Piece(5, 0, self.current_shape_idx)
@@ -45,13 +43,10 @@ class Game(ABCGame):
         clock = pygame.time.Clock()
         run = True
         get_next_piece = False
-        side_key_press = False
         down_key_press = False
         speed = GameConsts.STARTING_SPEED
-        left_right_key_refresh_rate = GameConsts.LEFT_RIGHT_KEY_REFRESH
         down_key_refresh_rate = GameConsts.DOWN_KEY_REFRESH
         delta = 0
-        delta_side_key = 0
         delta_down_key = 0
         level = 0
 
@@ -60,7 +55,6 @@ class Game(ABCGame):
         while run:
             clock.tick()
             delta += clock.get_rawtime()
-            delta_side_key += clock.get_rawtime()
             delta_down_key += clock.get_rawtime()
             level += clock.get_rawtime()
 
@@ -72,16 +66,13 @@ class Game(ABCGame):
                     speed -= GameConsts.INC
                 level = 0
 
-            if delta > speed:
+            if delta > speed and down_key_press:
                 current_piece.y += 1
                 if not self.screen.is_valid_rotation(current_piece.decode_shape()):
                     current_piece.y -= 1
                     get_next_piece = True
                 delta = 0
 
-            if delta_side_key > left_right_key_refresh_rate:
-                side_key_press = True
-                delta_side_key = 0
             if delta_down_key > down_key_refresh_rate:
                 down_key_press = True
                 delta_down_key = 0
@@ -100,17 +91,20 @@ class Game(ABCGame):
                 if not self.screen.is_valid_rotation(current_piece.decode_shape()):
                     current_piece.unrotate()
 
-            if event == consts.Action.RIGHT and side_key_press:
+            if event == consts.Action.RIGHT:
                 current_piece.x += 1
-                side_key_press = False
+
                 if not self.screen.is_valid_rotation(current_piece.decode_shape()):
                     current_piece.x -= 1
 
-            if event == consts.Action.LEFT and side_key_press:
+            if event == consts.Action.LEFT:
                 current_piece.x -= 1
-                side_key_press = False
                 if not self.screen.is_valid_rotation(current_piece.decode_shape()):
                     current_piece.x += 1
+
+            for loc in current_piece.decode_shape():
+                if loc[1] >= 0:
+                    self.screen.grid[loc[1]][loc[0]] = current_piece.color
 
             if get_next_piece:
                 for pos in current_piece.decode_shape():
@@ -121,18 +115,23 @@ class Game(ABCGame):
                 next_piece = Piece(3, 3, self.next_shape_idx)
                 get_next_piece = False
 
-                self.screen.clear_filled_rows(self.screen.is_row_filled())
+                rows = self.screen.is_row_filled()
+                self.screen.clear_filled_rows(rows)
+                self.score += self.screen.get_score(len(rows))
 
-            for loc in current_piece.decode_shape():
-                if loc[1] >= 0:
-                    self.screen.grid[loc[1]][loc[0]] = current_piece.color
+            highest_score = self.screen.update_highest_score(self.score)
 
             if self.screen.is_game_over():
-                # TODO implement game over
-                print("game over")
+                if self.is_player_human:
+                    self.display.draw_game_over(self.score, highest_score)
+                    sleep(2)
+                    action = False
+                    while not action:
+                        action = handler.handle_events_for_game_over()
 
-                # TODO implement score
-
-                # TODO make the game prettier
+                    self.__init__()
+                    self.play()
+                else:
+                    pass
 
             self.display.draw_screen(self.screen.grid, next_positions, next_piece.color, self.score)

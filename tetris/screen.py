@@ -32,7 +32,7 @@ class Screen:
         get_score(n):
          Updates the game's score according to tetris' scoring system.
         update_highest_score(score):
-         Writes the highest score to a file.
+         Writes the highest score to a file and returns it.
     """
 
     def __init__(self) -> None:
@@ -112,7 +112,7 @@ class Screen:
         return True
 
     @staticmethod
-    def get_score(n: int):
+    def get_score(n: int) -> None:
         """
             Updates the score of the game.
             40 - 1 line
@@ -124,12 +124,13 @@ class Screen:
         return score[n]
 
     @staticmethod
-    def update_highest_score(score: int):
+    def update_highest_score(score: int) -> int:
         """
              Writes the highest score to a file.
         """
         local_dir = os.path.dirname(__file__)
-        config_path = os.path.join(local_dir, 'highscore.txt')
+        path_parent = os.path.dirname(local_dir)
+        config_path = os.path.join(path_parent, 'highscore.txt')
 
         with open(config_path, 'r') as file:
             lines = file.readlines()
@@ -138,5 +139,7 @@ class Screen:
         with open(config_path, 'w') as file:
             if score > highest_score:
                 file.write(str(score))
+                return score
             else:
                 file.write(str(highest_score))
+                return highest_score
