@@ -6,7 +6,7 @@ from enum import Enum
 
 
 class DisplayConsts:
-    FPS = 60
+    FPS = 30
     SCREEN_WIDTH = 600
     SCREEN_HEIGHT = 600
     PLAY_WIDTH = 250
@@ -27,7 +27,8 @@ class GameConsts:
     GRID_FILL = (20, 20, 20)
     STARTING_SPEED = 400
     TIME = 4000
-    LEFT_RIGHT_KEY_REFRESH = 100
+    # TODO fix the movement
+    LEFT_RIGHT_KEY_REFRESH = 20
     DOWN_KEY_REFRESH = 50
     MAX_SPEED = 50
     INC = 1

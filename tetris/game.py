@@ -131,4 +131,8 @@ class Game(ABCGame):
                 # TODO implement game over
                 print("game over")
 
+                # TODO implement score
+
+                # TODO make the game prettier
+
             self.display.draw_screen(self.screen.grid, next_positions, next_piece.color, self.score)
