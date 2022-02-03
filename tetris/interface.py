@@ -11,10 +11,3 @@ class ABCGame(ABC):
             Future main loop of the game.
         """
         pass
-
-    @abstractmethod
-    def _is_game_over(self):
-        """
-            Checks for game over state.
-        """
-        pass
