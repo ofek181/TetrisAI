@@ -77,13 +77,13 @@ class Screen:
             clear a row if the said row is already filled.
             take down all following rows by 1 for each deleted row
         """
-        filled_rows.sort(reverse=True)
+        filled_rows.sort()
         for y in filled_rows:
             for x in range(len(self.grid[y])):
                 del self.taken_positions[(x, y)]
 
         for row in filled_rows:
-            for y in range(row, 0, -1):
+            for y in range(row, -1, -1):
                 for x in range(len(self.grid[y])):
                     if (x, y) in self.taken_positions:
                         self.taken_positions[(x, y + 1)] = self.taken_positions.pop((x, y))
