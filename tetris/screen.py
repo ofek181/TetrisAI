@@ -81,10 +81,12 @@ class Screen:
         for y in filled_rows:
             for x in range(len(self.grid[y])):
                 del self.taken_positions[(x, y)]
-            for next_y in range(y - 1, 0, -1):
-                for next_x in range(len(self.grid[next_y])):
-                    if (next_x, next_y) in self.taken_positions:
-                        self.taken_positions[(next_x, next_y + 1)] = self.taken_positions.pop((next_x, next_y))
+
+        for row in filled_rows:
+            for y in range(row, 0, -1):
+                for x in range(len(self.grid[y])):
+                    if (x, y) in self.taken_positions:
+                        self.taken_positions[(x, y + 1)] = self.taken_positions.pop((x, y))
 
     def is_game_over(self) -> bool:
         """
