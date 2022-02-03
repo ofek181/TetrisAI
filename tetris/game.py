@@ -1,9 +1,13 @@
 import random
 import pygame
+from time import sleep
+
+import consts
 from tetris.interface import ABCGame
 from tetris.piece import Piece
 from tetris.screen import Screen
 from tetris.display import Display
+from tetris.event_handler import EventHandler
 from consts import GameConsts
 
 
@@ -41,13 +45,23 @@ class Game(ABCGame):
         clock = pygame.time.Clock()
         run = True
         get_next_piece = False
+        side_key_press = False
+        down_key_press = False
         speed = GameConsts.STARTING_SPEED
+        left_right_key_refresh_rate = GameConsts.LEFT_RIGHT_KEY_REFRESH
+        down_key_refresh_rate = GameConsts.DOWN_KEY_REFRESH
         delta = 0
+        delta_side_key = 0
+        delta_down_key = 0
         level = 0
+
+        handler = EventHandler()
 
         while run:
             clock.tick()
             delta += clock.get_rawtime()
+            delta_side_key += clock.get_rawtime()
+            delta_down_key += clock.get_rawtime()
             level += clock.get_rawtime()
 
             self.screen.update_grid()
@@ -65,33 +79,38 @@ class Game(ABCGame):
                     get_next_piece = True
                 delta = 0
 
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE):
-                    run = False
-                    pygame.display.quit()
-                    quit()
+            if delta_side_key > left_right_key_refresh_rate:
+                side_key_press = True
+                delta_side_key = 0
+            if delta_down_key > down_key_refresh_rate:
+                down_key_press = True
+                delta_down_key = 0
 
-                elif event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_LEFT:
-                        current_piece.x -= 1
-                        if not self.screen.is_valid_rotation(current_piece.decode_shape()):
-                            current_piece.x += 1
+            event = handler.handle_events()
 
-                    elif event.key == pygame.K_RIGHT:
-                        current_piece.x += 1
-                        if not self.screen.is_valid_rotation(current_piece.decode_shape()):
-                            current_piece.x -= 1
+            if event == consts.Action.DOWN and down_key_press:
+                current_piece.y += 1
+                down_key_press = False
+                if not self.screen.is_valid_rotation(current_piece.decode_shape()):
+                    current_piece.y -= 1
+                    get_next_piece = True
 
-                    elif event.key == pygame.K_DOWN:
-                        current_piece.y += 1
-                        if not self.screen.is_valid_rotation(current_piece.decode_shape()):
-                            current_piece.y -= 1
-                            get_next_piece = True
+            if event == consts.Action.UP:
+                current_piece.rotate()
+                if not self.screen.is_valid_rotation(current_piece.decode_shape()):
+                    current_piece.unrotate()
 
-                    elif event.key == pygame.K_UP:
-                        current_piece.rotate()
-                        if not self.screen.is_valid_rotation(current_piece.decode_shape()):
-                            current_piece.unrotate()
+            if event == consts.Action.RIGHT and side_key_press:
+                current_piece.x += 1
+                side_key_press = False
+                if not self.screen.is_valid_rotation(current_piece.decode_shape()):
+                    current_piece.x -= 1
+
+            if event == consts.Action.LEFT and side_key_press:
+                current_piece.x -= 1
+                side_key_press = False
+                if not self.screen.is_valid_rotation(current_piece.decode_shape()):
+                    current_piece.x += 1
 
             if get_next_piece:
                 for pos in current_piece.decode_shape():

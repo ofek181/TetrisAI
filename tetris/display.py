@@ -59,7 +59,6 @@ class Display:
         """
             Displays the upcoming shape.
         """
-        # TODO fix this bug
         font = pygame.font.SysFont(DisplayConsts.FONT, DisplayConsts.FONT_SIZE)
         label = font.render('Next Shape:', True, DisplayConsts.FONT_COLOR)
         top_left_x = int(DisplayConsts.TOP_LEFT_X + DisplayConsts.PLAY_WIDTH * 1.2)
