@@ -7,8 +7,10 @@ class EventHandler:
         A static class to implement the event handler of the game.
         Methods
         ----------------------------
-        handle_events() -> int:
-         a function to handle the left user events during the game run time.
+        handle_events() -> Action:
+         a function to handle the user's events during the game run time.
+         handle_events() -> bool:
+         a function to handle the user's events during the game over screen.
     """
 
     @staticmethod
@@ -39,3 +41,19 @@ class EventHandler:
         if keys[pygame.K_DOWN]:
             return Action.DOWN
 
+    @staticmethod
+    def handle_events_for_game_over() -> bool:
+        """
+        Handles the user's inputs during the game over screen.
+        Returns
+            True if a key is pressed down
+        """
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE):
+                pygame.display.quit()
+                quit()
+
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE:
+                    return True
+        return False
