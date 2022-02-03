@@ -1,3 +1,5 @@
+from enum import Enum
+
 # class AudioConsts:
 #     HIT_AUDIO = os.path.join(local_dir_audio, 'hit.wav')
 #     SCORE_AUDIO = os.path.join(local_dir_audio, 'score.wav')
@@ -16,6 +18,7 @@ class DisplayConsts:
     FONT = 'comicsans'
     FONT_SIZE = 30
     FONT_COLOR = (220, 220, 220)
+    BLACK = (0, 0, 0)
 
 
 class GameConsts:
@@ -24,8 +27,17 @@ class GameConsts:
     GRID_FILL = (20, 20, 20)
     STARTING_SPEED = 400
     TIME = 4000
+    LEFT_RIGHT_KEY_REFRESH = 100
+    DOWN_KEY_REFRESH = 50
     MAX_SPEED = 50
     INC = 1
+
+
+class Action(Enum):
+    DOWN = 0
+    UP = 1
+    RIGHT = 2
+    LEFT = 3
 
 
 class PieceConsts:

@@ -93,6 +93,7 @@ class Display:
         """
             Implements a frame of the game.
         """
+        self.window.fill(DisplayConsts.BLACK)
         self.draw_grid(grid)
         self.display_next_piece(positions, color)
         self.display_score(score)
