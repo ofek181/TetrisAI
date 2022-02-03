@@ -27,9 +27,7 @@ class GameConsts:
     GRID_FILL = (20, 20, 20)
     STARTING_SPEED = 400
     TIME = 4000
-    # TODO fix the movement
-    LEFT_RIGHT_KEY_REFRESH = 20
-    DOWN_KEY_REFRESH = 50
+    DOWN_KEY_REFRESH = 40
     MAX_SPEED = 50
     INC = 1
 
@@ -43,12 +41,12 @@ class Action(Enum):
 
 class PieceConsts:
     PIECE_SIZE = 10
-    GREEN = (0, 255, 0)
-    RED = (255, 0, 0)
-    CYAN = (0, 255, 255)
-    YELLOW = (255, 255, 0)
-    BLUE = (0, 0, 255)
-    ORANGE = (255, 127, 0)
+    GREEN = (114, 203, 59)
+    RED = (255, 50, 19)
+    CYAN = (0, 190, 200)
+    YELLOW = (255, 213, 0)
+    BLUE = (3, 65, 174)
+    ORANGE = (255, 151, 28)
     PURPLE = (128, 0, 128)
 
     S = [['.....',
@@ -57,9 +55,9 @@ class PieceConsts:
           '.00..',
           '.....'],
          ['.....',
+          '.0...',
+          '.00..',
           '..0..',
-          '..00.',
-          '...0.',
           '.....']]
 
     Z = [['.....',
@@ -68,16 +66,16 @@ class PieceConsts:
           '..00.',
           '.....'],
          ['.....',
+          '...0.',
+          '..00.',
           '..0..',
-          '.00..',
-          '.0...',
           '.....']]
 
     I = [['.....',
-          '..0..',
-          '..0..',
-          '..0..',
-          '..0..'],
+          '.0...',
+          '.0...',
+          '.0...',
+          '.0...'],
          ['.....',
           '0000.',
           '.....',
