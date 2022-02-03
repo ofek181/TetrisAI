@@ -29,14 +29,13 @@ class EventHandler:
 
             if event.type == pygame.KEYDOWN and event.key == pygame.K_UP:
                 return Action.UP
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_RIGHT:
+                return Action.RIGHT
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_LEFT:
+                return Action.LEFT
 
         keys = pygame.key.get_pressed()
 
         if keys[pygame.K_DOWN]:
             return Action.DOWN
 
-        if keys[pygame.K_RIGHT]:
-            return Action.RIGHT
-
-        if keys[pygame.K_LEFT]:
-            return Action.LEFT
