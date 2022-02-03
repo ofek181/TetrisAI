@@ -93,7 +93,7 @@ class Display:
         txt1 = font.render('Game over', True, DisplayConsts.FONT_COLOR)
         scr = font.render('Score: ' + str(score), True, DisplayConsts.FONT_COLOR)
         highest_scr = font.render('Highest Score: ' + str(highest_score), True, DisplayConsts.FONT_COLOR)
-        txt2 = font.render('Press any key to continue', True, DisplayConsts.FONT_COLOR)
+        txt2 = font.render('Press Space to continue', True, DisplayConsts.FONT_COLOR)
         display_x = DisplayConsts.TOP_LEFT_X + DisplayConsts.PLAY_WIDTH // 2 - DisplayConsts.FONT_SIZE // 2
         display_y = DisplayConsts.TOP_LEFT_Y + DisplayConsts.PLAY_HEIGHT // 2 - DisplayConsts.FONT_SIZE * 5
         buff = 60
