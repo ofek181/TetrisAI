@@ -25,11 +25,11 @@ class GameConsts:
     GRID_WIDTH = 10
     GRID_HEIGHT = 20
     GRID_FILL = (20, 20, 20)
-    STARTING_SPEED = 400
+    STARTING_SPEED = 350
     TIME = 4000
-    DOWN_KEY_REFRESH = 40
-    MAX_SPEED = 50
-    INC = 1
+    DOWN_KEY_REFRESH = 20
+    MAX_SPEED = 100
+    INC = 2
 
 
 class Action(Enum):
