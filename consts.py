@@ -2,6 +2,7 @@ from enum import Enum
 import os
 local_dir_audio = os.path.join(os.path.dirname(__file__), "audio")
 
+
 class AudioConsts:
     CLEAR = os.path.join(local_dir_audio, 'Clear.wav')
     GAMEOVER = os.path.join(local_dir_audio, 'Gameover.wav')
@@ -30,7 +31,7 @@ class GameConsts:
     GRID_FILL = (20, 20, 20)
     STARTING_SPEED = 350
     TIME = 4000
-    DOWN_KEY_REFRESH = 20
+    DOWN_KEY_REFRESH = 30
     MAX_SPEED = 100
     INC = 2
 
@@ -80,10 +81,10 @@ class PieceConsts:
           '.0...',
           '.0...'],
          ['.....',
-          '0000.',
           '.....',
           '.....',
-          '.....']]
+          '.....',
+          '0000.']]
 
     O = [['.....',
           '.....',
