@@ -112,7 +112,7 @@ class Screen:
         return True
 
     @staticmethod
-    def get_score(n: int) -> None:
+    def get_score(n: int) -> int:
         """
             Updates the score of the game.
             40 - 1 line
