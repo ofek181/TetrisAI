@@ -1,8 +1,11 @@
 from enum import Enum
+import os
+local_dir_audio = os.path.join(os.path.dirname(__file__), "audio")
 
-# class AudioConsts:
-#     HIT_AUDIO = os.path.join(local_dir_audio, 'hit.wav')
-#     SCORE_AUDIO = os.path.join(local_dir_audio, 'score.wav')
+class AudioConsts:
+    CLEAR = os.path.join(local_dir_audio, 'Clear.wav')
+    GAMEOVER = os.path.join(local_dir_audio, 'Gameover.wav')
+    THEME = os.path.join(local_dir_audio, 'Theme.mp3')
 
 
 class DisplayConsts:

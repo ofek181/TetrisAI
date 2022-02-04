@@ -8,6 +8,7 @@ from tetris.piece import Piece
 from tetris.screen import Screen
 from tetris.display import Display
 from tetris.event_handler import EventHandler
+from tetris.sound import Audio
 from consts import GameConsts
 
 
@@ -26,7 +27,7 @@ class Game(ABCGame):
              /////////////////////////////////////////
         """
 
-    def __init__(self, is_player_human: bool = True) -> None:
+    def __init__(self) -> None:
         """
             Constructs all the necessary attributes for the Game object.
         """
@@ -34,9 +35,8 @@ class Game(ABCGame):
         self.screen = Screen()
         self.current_shape_idx, self.next_shape_idx = random.randint(0, 6), random.randint(0, 6)
         self.score = 0
-        self.is_player_human = is_player_human
 
-    def play(self):
+    def play(self, is_player_human: bool = True, audio: bool = True) -> None:
         current_piece = Piece(5, 0, self.current_shape_idx)
         next_piece = Piece(3, 3, self.next_shape_idx)
 
@@ -51,6 +51,8 @@ class Game(ABCGame):
         level = 0
 
         handler = EventHandler()
+        if audio:
+            Audio.theme()
 
         while run:
             clock.tick()
@@ -116,22 +118,25 @@ class Game(ABCGame):
                 get_next_piece = False
 
                 rows = self.screen.is_row_filled()
+                if len(rows) > 0:
+                    Audio.clear()
                 self.screen.clear_filled_rows(rows)
                 self.score += self.screen.get_score(len(rows))
 
             highest_score = self.screen.update_highest_score(self.score)
 
             if self.screen.is_game_over():
-                if self.is_player_human:
+                if audio:
+                    Audio.game_over()
+
+                if is_player_human:
                     self.display.draw_game_over(self.score, highest_score)
                     sleep(2)
                     action = False
                     while not action:
                         action = handler.handle_events_for_game_over()
 
-                    self.__init__()
-                    self.play()
-                else:
-                    pass
+                self.__init__()
+                self.play(is_player_human)
 
             self.display.draw_screen(self.screen.grid, next_positions, next_piece.color, self.score)
