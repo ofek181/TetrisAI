@@ -14,17 +14,27 @@ from consts import GameConsts
 
 class Game(ABCGame):
     """
-            A class to implement the Tetris game.
-            ----------------------------
-            Attributes
-            ----------------------------
-           ////////////////////////////
-            ----------------------------
-            Methods
-            ----------------------------
-            __init__(self):
-             Constructs all the necessary attributes for the Game object.
-             /////////////////////////////////////////
+        A class to implement the Tetris game.
+        ----------------------------
+        Attributes
+        ----------------------------
+        display:
+         an attribute to represent the display of the game.
+        screen:
+         an attribute to represent the screen and logic of the game.
+        current_shape_idx:
+         the current piece's shape.
+        next_shape_idx:
+         the next piece's shape.
+        score:
+         current score of the game.
+        ----------------------------
+        Methods
+        ----------------------------
+        __init__(self):
+         Constructs all the necessary attributes for the Display object.
+        play(self, is_player_human, audio)
+         Main loop of the game. Containing all the logic and implementations for Tetris.
         """
 
     def __init__(self) -> None:
@@ -37,6 +47,9 @@ class Game(ABCGame):
         self.score = 0
 
     def play(self, is_player_human: bool = True, audio: bool = True) -> None:
+        """
+            Main loop of the game. Containing all the logic and implementations for Tetris.
+        """
         current_piece = Piece(5, 0, self.current_shape_idx)
         next_piece = Piece(3, 3, self.next_shape_idx)
 
@@ -137,6 +150,6 @@ class Game(ABCGame):
                         action = handler.handle_events_for_game_over()
 
                 self.__init__()
-                self.play(is_player_human)
+                self.play(is_player_human, audio)
 
             self.display.draw_screen(self.screen.grid, next_positions, next_piece.color, self.score)
