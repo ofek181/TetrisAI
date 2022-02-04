@@ -50,6 +50,7 @@ class Game(ABCGame):
         """
             Main loop of the game. Containing all the logic and implementations for Tetris.
         """
+        # initiate objects and variables
         current_piece = Piece(5, 0, self.current_shape_idx)
         next_piece = Piece(3, 3, self.next_shape_idx)
 
@@ -57,6 +58,7 @@ class Game(ABCGame):
         run = True
         get_next_piece = False
         down_key_press = False
+        check_collision = False
         speed = GameConsts.STARTING_SPEED
         down_key_refresh_rate = GameConsts.DOWN_KEY_REFRESH
         delta = 0
@@ -67,31 +69,37 @@ class Game(ABCGame):
         if audio:
             Audio.theme()
 
+        # main loop of the game
         while run:
+            # use time for the changing the difficulty and speed of the game.
             clock.tick()
             delta += clock.get_rawtime()
             delta_down_key += clock.get_rawtime()
             level += clock.get_rawtime()
-
-            self.screen.update_grid()
             next_positions = next_piece.decode_shape()
 
+            self.screen.update_grid()
+
+            # decrease the spawn time of new pieces as the game progresses.
             if level > GameConsts.TIME:
-                if speed > GameConsts.MAX_SPEED:  # smaller speed is faster
+                if speed > GameConsts.MAX_SPEED:
                     speed -= GameConsts.INC
                 level = 0
 
+            # if a user doesnt press down_key then gravity occurs.
             if delta > speed and down_key_press:
                 current_piece.y += 1
                 if not self.screen.is_valid_rotation(current_piece.decode_shape()):
                     current_piece.y -= 1
-                    get_next_piece = True
+                    check_collision = True
                 delta = 0
 
+            # the user can press the down key but we need to make sure the pieces doesnt fall immediately.
             if delta_down_key > down_key_refresh_rate:
                 down_key_press = True
                 delta_down_key = 0
 
+            # handle the different user's actions during the game.
             event = handler.handle_events()
 
             if event == consts.Action.DOWN and down_key_press:
@@ -99,7 +107,7 @@ class Game(ABCGame):
                 down_key_press = False
                 if not self.screen.is_valid_rotation(current_piece.decode_shape()):
                     current_piece.y -= 1
-                    get_next_piece = True
+                    check_collision = True
 
             if event == consts.Action.UP:
                 current_piece.rotate()
@@ -121,6 +129,27 @@ class Game(ABCGame):
                 if loc[1] >= 0:
                     self.screen.grid[loc[1]][loc[0]] = current_piece.color
 
+            # check for collisions with ground or other pieces.
+            # important the case where at the start of the frame the piece was in a collided positions
+            # but a user's input made it so that it now in a valid position
+            # in that case, get_next_piece needs to be False because a collision did not occur.
+            if check_collision:
+                current_piece.y += 1
+                # checks for collisions with other pieces
+                for pos in current_piece.decode_shape():
+                    if pos in self.screen.taken_positions:
+                        get_next_piece = True
+
+                # checks for collisions with the ground
+                if not get_next_piece:
+                    if current_piece.y >= GameConsts.GRID_HEIGHT:
+                        if not self.screen.is_valid_rotation(current_piece.decode_shape()):
+                            get_next_piece = True
+
+                current_piece.y -= 1
+                check_collision = False
+
+            # handles the event of a collision and gets a new piece into the grid.
             if get_next_piece:
                 for pos in current_piece.decode_shape():
                     self.screen.taken_positions[pos] = current_piece.color
@@ -136,8 +165,10 @@ class Game(ABCGame):
                 self.screen.clear_filled_rows(rows)
                 self.score += self.screen.get_score(len(rows))
 
+            # checks if the current score is greater than the highest score and saves it.
             highest_score = self.screen.update_highest_score(self.score)
 
+            # checks if the user lost and handles the game over screen and audio.
             if self.screen.is_game_over():
                 if audio:
                     Audio.game_over()
@@ -152,4 +183,5 @@ class Game(ABCGame):
                 self.__init__()
                 self.play(is_player_human, audio)
 
+            # refreshes the display with respect to the FPS of the game.
             self.display.draw_screen(self.screen.grid, next_positions, next_piece.color, self.score)
