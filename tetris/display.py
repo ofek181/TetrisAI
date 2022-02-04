@@ -55,7 +55,7 @@ class Display:
                              (top_left_x + x * block_size, top_left_y),
                              (top_left_x + x * block_size, top_left_y + height))
 
-    def display_next_piece(self, positions: list, color: tuple):
+    def display_next_piece(self, positions: list, color: tuple) -> None:
         """
             Displays the upcoming shape.
         """
@@ -76,7 +76,7 @@ class Display:
 
         self.window.blit(label, (top_left_x, top_left_y - 2 * bs))
 
-    def display_score(self, score: int):
+    def display_score(self, score: int) -> None:
         """
             Displays the current game score.
         """
