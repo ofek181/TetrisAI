@@ -18,7 +18,7 @@ class DisplayConsts:
     BLOCK_SIZE = PLAY_WIDTH // 10
     TOP_LEFT_X = (SCREEN_WIDTH - PLAY_WIDTH) // 8
     TOP_LEFT_Y = (SCREEN_HEIGHT - PLAY_HEIGHT) // 2
-    GRID_COLOR = (200, 200, 200)
+    GRID_COLOR = (255, 255, 255)
     FONT = 'comicsans'
     FONT_SIZE = 30
     FONT_COLOR = (220, 220, 220)
@@ -48,9 +48,9 @@ class PieceConsts:
     GREEN = (114, 203, 59)
     RED = (255, 50, 19)
     CYAN = (0, 190, 200)
-    YELLOW = (255, 213, 0)
+    YELLOW = (255, 215, 0)
     BLUE = (3, 65, 174)
-    ORANGE = (255, 151, 28)
+    ORANGE = (255, 140, 35)
     PURPLE = (128, 0, 128)
 
     S = [['.....',
