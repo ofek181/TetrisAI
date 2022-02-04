@@ -17,7 +17,7 @@ class Audio:
     """
 
     @staticmethod
-    def clear():
+    def clear() -> None:
         """
             Play a sound when lines are cleared.
         """
@@ -27,7 +27,7 @@ class Audio:
         channel.play(sound)
 
     @staticmethod
-    def game_over():
+    def game_over() -> None:
         """
             Play a sound when game is over.
         """
@@ -37,7 +37,7 @@ class Audio:
         channel.play(sound)
 
     @staticmethod
-    def theme():
+    def theme() -> None:
         """
             Play the theme of the game.
         """
