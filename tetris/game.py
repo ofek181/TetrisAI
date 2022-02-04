@@ -154,7 +154,10 @@ class Game(ABCGame):
                 for pos in current_piece.decode_shape():
                     self.screen.taken_positions[pos] = current_piece.color
                 self.current_shape_idx = self.next_shape_idx
-                self.next_shape_idx = random.randint(0, 6)
+                next_idx = random.randint(0, 6)
+                while self.current_shape_idx == next_idx:
+                    next_idx = random.randint(0, 6)
+                self.next_shape_idx = next_idx
                 current_piece = Piece(5, 0, self.current_shape_idx)
                 next_piece = Piece(3, 3, self.next_shape_idx)
                 get_next_piece = False
