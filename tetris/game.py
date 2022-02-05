@@ -44,6 +44,8 @@ class Game(ABCGame):
         self.display = Display()
         self.screen = Screen()
         self.current_shape_idx, self.next_shape_idx = random.randint(0, 6), random.randint(0, 6)
+        while self.current_shape_idx == self.next_shape_idx:
+            self.next_shape_idx = random.randint(0, 6)
         self.score = 0
 
     def play(self, is_player_human: bool = True, audio: bool = True) -> None:
