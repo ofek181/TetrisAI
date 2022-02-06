@@ -10,7 +10,6 @@ class DeepQNetwork(nn.Module):
     """
         A class to implement the DQN model using the standard way in pytorch __init__ and forward.
     """
-
     def __init__(self):
         """
             Implements the architecture of the model.
