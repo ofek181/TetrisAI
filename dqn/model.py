@@ -1,9 +1,10 @@
-import torch
 import torch.nn as nn
 import torch.nn.functional
 from consts import GameConsts
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+# TODO think about a model that can get an input of a 20x10 matrix as well as the next piece shape
 
 
 class DeepQNetwork(nn.Module):
@@ -33,7 +34,7 @@ class DeepQNetwork(nn.Module):
         # 2 dense layers and output layer
         self.linear1 = nn.Linear(input_size, 128)
         self.linear2 = nn.Linear(input_size, 10)
-        self.output = nn.Linear(input_size, 4)
+        self.output = nn.Linear(input_size, 3)
 
     def forward(self, x):
         """
