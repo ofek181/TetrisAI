@@ -1,10 +1,9 @@
 import random
 
-import consts
 from tetris.piece import Piece
 from tetris.screen import Screen
 from tetris.display import Display
-from consts import GameConsts
+from consts import GameConsts, Action
 
 
 class Environment:
@@ -21,7 +20,7 @@ class Environment:
         while self.current_shape_idx == self.next_shape_idx:
             self.next_shape_idx = random.randint(0, 6)
         self.score = 0
-        self.game_over = 0
+        self.game_over = False
 
         self.current_piece = Piece(5, 0, self.current_shape_idx)
         self.next_piece = Piece(3, 3, self.next_shape_idx)
@@ -33,9 +32,10 @@ class Environment:
         self.__init__()
         self.play()
 
-    def get_state(self) -> list:
+    def get_state(self) -> tuple[list, int]:
         """
             returns a wXh matrix of 1s and 0s, 1 if there is a tetrimino and 0 if not.
+            also returns the next piece shape.
         """
         state = [[0 for _ in range(GameConsts.GRID_WIDTH)] for _ in range(GameConsts.GRID_HEIGHT)]
 
@@ -44,23 +44,23 @@ class Environment:
                 if self.screen.grid[y][x] != GameConsts.GRID_FILL:
                     state[y][x] = 1
 
-        return state
+        return state, self.next_shape_idx
 
     def step(self, action) -> None:
         """
             Step function where the user (AI) can enter an action of play.
         """
-        if action == consts.Action.UP:
+        if action == Action.UP:
             self.current_piece.rotate()
             if not self.screen.is_valid_rotation(self.current_piece.decode_shape()):
                 self.current_piece.unrotate()
 
-        if action == consts.Action.RIGHT:
+        if action == Action.LEFT:
             self.current_piece.x += 1
             if not self.screen.is_valid_rotation(self.current_piece.decode_shape()):
                 self.current_piece.x -= 1
 
-        if action == consts.Action.LEFT:
+        if action == Action.RIGHT:
             self.current_piece.x -= 1
             if not self.screen.is_valid_rotation(self.current_piece.decode_shape()):
                 self.current_piece.x += 1
@@ -101,7 +101,6 @@ class Environment:
             self.next_shape_idx = next_idx
             self.current_piece = Piece(5, 0, self.current_shape_idx)
             self.next_piece = Piece(3, 3, self.next_shape_idx)
-            get_next_piece = False
 
             rows = self.screen.is_row_filled()
             self.screen.clear_filled_rows(rows)
@@ -112,7 +111,7 @@ class Environment:
 
         # checks if the user lost and handles the game over screen and audio.
         if self.screen.is_game_over():
-            self.game_over = 1
+            self.game_over = True
             # self.reset()
 
         # refreshes the display with respect to the FPS of the game.
