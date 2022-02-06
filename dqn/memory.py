@@ -1,35 +1,50 @@
+import numpy as np
 import random
-from collections import namedtuple, deque
-
-Transition = namedtuple('Transition', ('state', 'action', 'next_state', 'reward'))
 
 
-class ReplayMemory:
+class ExperienceBuffer:
     """
         Implementing experience replay memory for the DQN training.
         The memory stores the observations that the agent experiences. (s,a,s',r)
         By sampling from it randomly, we decorrelate the transitions.
     """
-    def __init__(self, capacity):
+    def __init__(self, state_shape: tuple, buffer_size: int = 10000):
         """
             Initiates the memory.
         """
-        self.memory = deque([], maxlen=capacity)
+        self.buffer = []
+        self.state_shape = state_shape
+        self.buffer_size = buffer_size
 
-    def push(self, *args):
+    def add(self, state: np.array, action: str, reward: int, state_next: np.array, done: bool) -> None:
         """
-            Saves a transition (namedtuple).
+            Adds a new (state, action, reward, next_state) pair.
         """
-        self.memory.append(Transition(*args))
+        if len(self.buffer) >= self.buffer_size:
+            self.buffer.pop(0)
 
-    def sample(self, batch_size):
-        """
-            Randomly samples from the memory.
-        """
-        return random.sample(self.memory, batch_size)
+        experience = np.concatenate([
+            state.flatten(),
+            np.array(action).flatten(),
+            np.array(reward).flatten(),
+            state_next.flatten(),
+            np.array(int(done)).flatten()
+        ])
+        self.buffer.append(experience)
 
-    def __len__(self):
+    def get_batch(self, size: int) -> dict:
         """
-            Returns the length of the memory.
+            randomly samples a batch.
         """
-        return len(self.memory)
+        batch_size = min(len(self.buffer), size)
+        state_size = np.prod(self.state_shape)
+
+        experiences = np.array(random.sample(self.buffer, batch_size))  # sampling some experiences
+
+        batch = {'state': experiences[:, :state_size].reshape((batch_size,) + self.state_shape),
+                 'action': np.cast['int'](experiences[:, state_size]),
+                 'reward': experiences[:, state_size + 1],
+                 'state_next': experiences[:, state_size + 2:2 * state_size + 2].reshape(
+                     (batch_size,) + self.state_shape),
+                 'done': experiences[:, 2 * state_size + 2]}
+        return batch
