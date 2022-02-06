@@ -8,7 +8,7 @@ def main():
 
     if play:
         game = Game()
-        game.play(is_player_human, set_audio)
+        game.play(set_audio)
     else:
         pass
 

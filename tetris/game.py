@@ -48,7 +48,7 @@ class Game(ABCGame):
             self.next_shape_idx = random.randint(0, 6)
         self.score = 0
 
-    def play(self, is_player_human: bool = True, audio: bool = True) -> None:
+    def play(self, audio: bool = True) -> None:
         """
             Main loop of the game. Containing all the logic and implementations for Tetris.
         """
@@ -178,15 +178,14 @@ class Game(ABCGame):
                 if audio:
                     Audio.game_over()
 
-                if is_player_human:
-                    self.display.draw_game_over(self.score, highest_score)
-                    sleep(2)
-                    action = False
-                    while not action:
-                        action = handler.handle_events_for_game_over()
+                self.display.draw_game_over(self.score, highest_score)
+                sleep(2)
+                action = False
+                while not action:
+                    action = handler.handle_events_for_game_over()
 
                 self.__init__()
-                self.play(is_player_human, audio)
+                self.play(audio)
 
             # refreshes the display with respect to the FPS of the game.
             self.display.draw_screen(self.screen.grid, next_positions, next_piece.color, self.score)
