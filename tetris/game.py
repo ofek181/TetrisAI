@@ -96,7 +96,7 @@ class Game(ABCGame):
                     check_collision = True
                 delta = 0
 
-            # the user can press the down key but we need to make sure the pieces doesnt fall immediately.
+            # the user can press the down key but we need to make sure the piece doesnt fall immediately.
             if delta_down_key > down_key_refresh_rate:
                 down_key_press = True
                 delta_down_key = 0
