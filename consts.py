@@ -41,6 +41,7 @@ class Action(Enum):
     UP = 1
     RIGHT = 2
     LEFT = 3
+    IDLE = 4
 
 
 class PieceConsts:
