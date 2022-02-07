@@ -26,29 +26,28 @@ class Environment:
         self.current_piece = Piece(5, 0, self.current_shape_idx)
         self.next_piece = Piece(3, 3, self.next_shape_idx)
 
-    def reset(self) -> None:
+    def reset(self, fps) -> None:
         """
             Resets the environment
         """
         self.__init__()
-        self.play()
+        self.play(Action.IDLE, fps)
 
     def get_state(self) -> numpy.ndarray:
         """
             returns a vector of 1s and 0s, 1 if there is a tetrimino and 0 if not.
             appended with the the next piece' shape.
         """
-        state = [0 for _ in range(GameConsts.GRID_WIDTH * GameConsts.GRID_HEIGHT)]
+        state = [[0 for _ in range(GameConsts.GRID_HEIGHT)] for _ in range(GameConsts.GRID_WIDTH)]
 
         for y in range(len(self.screen.grid)):
             for x in range(len(self.screen.grid[y])):
                 if self.screen.grid[y][x] != GameConsts.GRID_FILL:
-                    state[y * len(self.screen.grid[y]) + x] = 1
+                    state[x][y] = 1
 
-        state.append(self.next_shape_idx)
         return numpy.asarray(state)
 
-    def step(self, action) -> None:
+    def _step(self, action) -> None:
         """
             Step function where the user (AI) can enter an action of play.
         """
@@ -70,7 +69,7 @@ class Environment:
         if action == Action.IDLE:
             pass
 
-    def play(self):
+    def play(self, action: Action, fps: int) -> None:
         get_next_piece = False
         self.screen.update_grid()
 
@@ -78,6 +77,8 @@ class Environment:
         self.current_piece.y += 1
         if not self.screen.is_valid_rotation(self.current_piece.decode_shape()):
             self.current_piece.y -= 1
+
+        self._step(action)
 
         for loc in self.current_piece.decode_shape():
             if loc[1] >= 0:
@@ -90,8 +91,8 @@ class Environment:
                 get_next_piece = True
 
         if not get_next_piece:
-            if self.current_piece.y >= GameConsts.GRID_HEIGHT:
-                if not self.screen.is_valid_rotation(self.current_piece.decode_shape()):
+            for pos in self.current_piece.decode_shape():
+                if pos[1] >= GameConsts.GRID_HEIGHT:
                     get_next_piece = True
         self.current_piece.y -= 1
 
@@ -121,4 +122,4 @@ class Environment:
 
         # refreshes the display with respect to the FPS of the game.
         self.display.draw_screen(self.screen.grid, self.next_piece.decode_shape(),
-                                 self.next_piece.color, self.score)
+                                 self.next_piece.color, self.score, fps)
