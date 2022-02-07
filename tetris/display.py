@@ -106,7 +106,7 @@ class Display:
 
         pygame.display.update()
 
-    def draw_screen(self, grid: list, positions: list, color: tuple, score: int) -> None:
+    def draw_screen(self, grid: list, positions: list, color: tuple, score: int, fps: int = DisplayConsts.FPS) -> None:
         """
             Implements a frame of the game.
         """
@@ -115,7 +115,7 @@ class Display:
         self.display_next_piece(positions, color)
         self.display_score(score)
 
-        pygame.time.Clock().tick(DisplayConsts.FPS)
+        pygame.time.Clock().tick(fps)
         pygame.display.update()
 
 
