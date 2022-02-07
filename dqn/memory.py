@@ -42,7 +42,7 @@ class ExperienceBuffer:
         experiences = np.array(random.sample(self.buffer, batch_size))  # sampling some experiences
 
         batch = {'state': experiences[:, :state_size].reshape((batch_size,) + self.state_shape),
-                 'action': np.cast['int'](experiences[:, state_size]),
+                 'action': experiences[:, state_size],
                  'reward': experiences[:, state_size + 1],
                  'state_next': experiences[:, state_size + 2:2 * state_size + 2].reshape(
                      (batch_size,) + self.state_shape),
