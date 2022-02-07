@@ -1,4 +1,5 @@
 import random
+import numpy
 
 from tetris.piece import Piece
 from tetris.screen import Screen
@@ -32,19 +33,20 @@ class Environment:
         self.__init__()
         self.play()
 
-    def get_state(self) -> tuple[list, int]:
+    def get_state(self) -> numpy.ndarray:
         """
-            returns a wXh matrix of 1s and 0s, 1 if there is a tetrimino and 0 if not.
-            also returns the next piece shape.
+            returns a vector of 1s and 0s, 1 if there is a tetrimino and 0 if not.
+            appended with the the next piece' shape.
         """
-        state = [[0 for _ in range(GameConsts.GRID_WIDTH)] for _ in range(GameConsts.GRID_HEIGHT)]
+        state = [0 for _ in range(GameConsts.GRID_WIDTH * GameConsts.GRID_HEIGHT)]
 
         for y in range(len(self.screen.grid)):
             for x in range(len(self.screen.grid[y])):
                 if self.screen.grid[y][x] != GameConsts.GRID_FILL:
-                    state[y][x] = 1
+                    state[y * len(self.screen.grid[y]) + x] = 1
 
-        return state, self.next_shape_idx
+        state.append(self.next_shape_idx)
+        return numpy.asarray(state)
 
     def step(self, action) -> None:
         """
@@ -64,6 +66,9 @@ class Environment:
             self.current_piece.x -= 1
             if not self.screen.is_valid_rotation(self.current_piece.decode_shape()):
                 self.current_piece.x += 1
+
+        if action == Action.IDLE:
+            pass
 
     def play(self):
         get_next_piece = False
