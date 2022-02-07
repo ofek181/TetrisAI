@@ -1,48 +1,24 @@
-import torch.nn as nn
-import torch.nn.functional
+import tensorflow as tf
 from consts import GameConsts
 
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-# TODO think about a model that can get an input of a 20x10 matrix as well as the next piece shape
+class DeepQNetwork:
+	def __init__(self):
+		input_size = GameConsts.GRID_WIDTH * GameConsts.GRID_HEIGHT + 1
+		tf.compat.v1.disable_eager_execution()
+		self.input = tf.compat.v1.placeholder(tf.float32, shape=input_size, name="input")
 
+		layer1 = tf.keras.layers.Dense(units=input_size, activation='relu')(self.input)
+		layer2 = tf.keras.layers.Dense(units=128, activation='relu')(layer1)
+		layer3 = tf.keras.layers.Dense(units=10, activation='relu')(layer2)
 
-class DeepQNetwork(nn.Module):
-    """
-        A class to implement the DQN model using the standard way in pytorch __init__ and forward.
-    """
-    def __init__(self):
-        """
-            Implements the architecture of the model.
-        """
-        super(DeepQNetwork, self).__init__()
+		self.output = tf.keras.layers.Dense(units=4)(layer3)
 
-        # convolutional layers
-        self.conv1 = nn.Conv2d(1, 8, kernel_size=(2, 2), stride=(1, 1))
-        self.bn1 = nn.BatchNorm2d(8)
-        self.conv2 = nn.Conv2d(8, 16, kernel_size=(2, 2), stride=(1, 1))
-        self.bn2 = nn.BatchNorm2d(16)
+		# Predict
+		self.predict_action = tf.argmax(self.output, 1)
 
-        # compute linear input
-        def conv2d_size_out(size, kernel_size=2, stride=2):
-            return (size - (kernel_size - 1) - 1) // stride + 1
-
-        convw = conv2d_size_out(conv2d_size_out(GameConsts.GRID_WIDTH))
-        convh = conv2d_size_out(conv2d_size_out(GameConsts.GRID_HEIGHT))
-        input_size = convw * convh * 16
-
-        # 2 dense layers and output layer
-        self.linear1 = nn.Linear(input_size, 128)
-        self.linear2 = nn.Linear(input_size, 10)
-        self.output = nn.Linear(input_size, 3)
-
-    def forward(self, x):
-        """
-            Implements the forward pass of the neural network.
-        """
-        x = x.to(device)
-        x = nn.functional.relu(self.bn1(self.conv1(x)))
-        x = nn.functional.relu(self.bn2(self.conv2(x)))
-        x = nn.functional.relu(self.bn1(self.linear1(x)))
-        x = nn.functional.relu(self.bn1(self.linear2(x)))
-        return self.output(x.view(x.size(0), -1))
+		# Train
+		self.target_Q = tf.compat.v1.placeholder(tf.float32, [None, 4])
+		self.learning_rate = tf.compat.v1.placeholder(tf.float32, name="learning_rate")
+		self.loss = tf.losses.mean_squared_error(self.target_Q, self.output)
+		self.update_model = tf.compat.v1.train.AdamOptimizer(self.learning_rate).minimize(self.loss)
