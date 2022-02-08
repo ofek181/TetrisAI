@@ -4,20 +4,20 @@ from consts import GameConsts
 
 class DeepQNetwork:
 	def __init__(self):
-		input_shape = (None, 1, GameConsts.GRID_WIDTH, GameConsts.GRID_HEIGHT)
+		input_shape = (None, 1, GameConsts.GRID_HEIGHT, GameConsts.GRID_WIDTH)
 		tf.compat.v1.disable_eager_execution()
 		self.input = tf.compat.v1.placeholder(tf.float32, shape=input_shape, name="input")
 
 		conv_layer_1 = tf.keras.layers.Conv2D(
-			filters=16,
-			kernel_size=(2, 4),
-			strides=(1, 2),
+			filters=8,
+			kernel_size=(2, 2),
+			strides=(1, 1),
 			activation='relu',
 			padding="same",
 			input_shape=input_shape)(self.input)
 
 		conv_layer_2 = tf.keras.layers.Conv2D(
-			filters=32,
+			filters=16,
 			kernel_size=(2, 2),
 			strides=(1, 1),
 			activation='relu',
@@ -26,7 +26,7 @@ class DeepQNetwork:
 		conv_2_flat = tf.keras.layers.Flatten()(conv_layer_2)
 
 		hidden = tf.keras.layers.Dense(
-			units=256,
+			units=64,
 			activation='relu')(conv_2_flat)
 
 		self.output_Q = tf.keras.layers.Dense(units=4)(hidden)
