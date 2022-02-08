@@ -38,12 +38,12 @@ class Environment:
             returns a vector of 1s and 0s, 1 if there is a tetrimino and 0 if not.
             appended with the the next piece' shape.
         """
-        state = [[0 for _ in range(GameConsts.GRID_HEIGHT)] for _ in range(GameConsts.GRID_WIDTH)]
+        state = [[0 for _ in range(GameConsts.GRID_WIDTH)] for _ in range(GameConsts.GRID_HEIGHT)]
 
         for y in range(len(self.screen.grid)):
             for x in range(len(self.screen.grid[y])):
                 if self.screen.grid[y][x] != GameConsts.GRID_FILL:
-                    state[x][y] = 1
+                    state[y][x] = 1
 
         return numpy.asarray(state)
 
