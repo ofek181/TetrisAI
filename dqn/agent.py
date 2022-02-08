@@ -50,16 +50,51 @@ class Agent:
             print("Episode: {0} out of: {1} Episodes, Time: {2}".format(i, num_steps, time_difference))
             start_time = datetime.now()
 
-    def train(self, num_steps: int = 20000, batch_size: int = 1000,
-              learning_rate: float = 0.1, y: float = 0.95,
-              start_e: float = 1.0, end_e: float = 0.001,
-              start_max_step: int = 10000, exploration_steps: int = 10000, save_name: str = None):
+    # @staticmethod
+    # def helper_reward(state) -> int:
+    #     reward = 0
+    #     state = state.tolist()
+    #     for idx, line in enumerate(state):
+    #         idx += 1
+    #         new_reward = line.count(1) * idx // GameConsts.GRID_HEIGHT
+    #         if new_reward > reward:
+    #             reward = new_reward
+    #     return reward
 
-        fps = 5000
+    @staticmethod
+    def helper_reward_positive(state) -> int:
+        reward = 0
+        state = state.tolist()
+        for line in state:
+            if line.count(1) >= 5:
+                reward += 1
+        return reward
+
+    @staticmethod
+    def helper_reward_negative(state) -> int:
+        reward = 0
+        state = state.tolist()
+        for line in state:
+            for idx, block in enumerate(line):
+                if 1 <= idx < GameConsts.GRID_WIDTH - 1:
+                    if block == 0 and line[idx - 1] == 1 and line[idx + 1] == 1:
+                        reward -= 1
+                if idx == 0 and block == 0 and line[1] == 1:
+                    reward -= 1
+                if idx == GameConsts.GRID_WIDTH and block == 0 and line[9] == 1:
+                    reward -= 1
+        return reward
+
+    def train(self, num_steps: int = 10000, batch_size: int = 1024,
+              learning_rate: float = 0.01, y: float = 0.9,
+              start_e: float = 1.0, end_e: float = 0.001,
+              start_max_step: int = 10000, exploration_steps: int = 2500, save_name: str = None):
+
+        fps = 2000
         global start_time
 
         env = Environment()
-        experience_buffer = ExperienceBuffer(state_shape=(1, GameConsts.GRID_WIDTH, GameConsts.GRID_HEIGHT))
+        experience_buffer = ExperienceBuffer(state_shape=(1, GameConsts.GRID_HEIGHT, GameConsts.GRID_WIDTH))
 
         self.session.run(tf.compat.v1.global_variables_initializer())
         e = start_e
@@ -95,7 +130,7 @@ class Agent:
                     self.sum_of_scores += env.score
                     reward = -10
                 else:
-                    reward = env.score - score + 5
+                    reward = env.score - score + Agent.helper_reward_positive(state) + Agent.helper_reward_negative(state)
 
                 state_next = env.get_state()
                 experience_buffer.add(state, action.value, reward, state_next, env.game_over)
@@ -123,24 +158,18 @@ class Agent:
             self._save_model(save_name)
             self.plot_learning_curve(num_steps, save_name)
 
-    def test(self):
+    def test(self) -> None:
         fps = 30
         tetris = Environment()
         tetris.reset(fps)
-        steps = 0
         while not tetris.game_over:
             state = tetris.get_state()
-            action = self.session.run(self.model.predict_action,
-                                      feed_dict={self.model.input: np.expand_dims(state, axis=0)})[0]
+            action = self.session.run(
+                self.model.predict_action,
+                feed_dict={self.model.input: np.expand_dims(np.expand_dims(state, axis=0), axis=0)})[0]
+
             action = Action(action)
-
             tetris.play(action, fps)
-
-            print(action)
-            steps += 1
-
-        print("Score: {0}, Steps: {1}".format(tetris.score, steps))
-        return tetris.score
 
     def plot_learning_curve(self, num_steps: int, name: str):
         save_path = os.path.join(ROOT_DIR, 'trained_model', name)
@@ -156,30 +185,29 @@ class Agent:
         plt.savefig(save_path)
         plt.show()
 
-    def plot_test_histogram(self, test_num: int):
-        scores = []
-        for i in range(test_num):
-            scores.append(self.test())
-        scores.sort()
-
-        plt.hist(scores, bins='auto')
-        plt.xlabel('Score')
-        plt.ylabel('Count')
-        plt.title('Histogram of test scores')
-        plt.grid(True)
-        save_path = os.path.join(ROOT_DIR, 'trained_model', 'histogram')
-        plt.savefig(save_path)
-        plt.show()
-
-        print("Max score: {0}, Min score: {1}, Average score: {2}".format(max(scores),
-                                                                          min(scores), sum(scores) / len(scores)))
+    # def plot_test_histogram(self, test_num: int):
+    #     scores = []
+    #     for i in range(test_num):
+    #         scores.append(self.test())
+    #     scores.sort()
+    #
+    #     plt.hist(scores, bins='auto')
+    #     plt.xlabel('Score')
+    #     plt.ylabel('Count')
+    #     plt.title('Histogram of test scores')
+    #     plt.grid(True)
+    #     save_path = os.path.join(ROOT_DIR, 'trained_model', 'histogram')
+    #     plt.savefig(save_path)
+    #     plt.show()
+    #
+    #     print("Max score: {0}, Min score: {1}, Average score: {2}".format(max(scores),
+    #                                                                       min(scores), sum(scores) / len(scores)))
 
 
 def main():
     agent = Agent(max_step=50000)
     agent.train(save_name="1.0")
-    # agent.load_model("15x10x100000x2000")
-    # agent.plot_test_histogram(100)
+    # agent.load_model("1.0")
     # agent.test()
 
 
