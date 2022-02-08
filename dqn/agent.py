@@ -61,36 +61,46 @@ class Agent:
     #             reward = new_reward
     #     return reward
 
-    @staticmethod
-    def helper_reward_positive(state) -> int:
-        reward = 0
-        state = state.tolist()
-        for line in state:
-            if line.count(1) >= 5:
-                reward += 1
-        return reward
+    # @staticmethod
+    # def helper_reward_positive(state) -> int:
+    #     reward = 0
+    #     state = state.tolist()
+    #     for line in state:
+    #         if line.count(1) >= 6:
+    #             reward += 1
+    #     return reward * 3
+    #
+    # @staticmethod
+    # def helper_reward_negative(state) -> int:
+    #     reward = 0
+    #     state = state.tolist()
+    #     for line in state:
+    #         for idx, block in enumerate(line):
+    #             if 1 <= idx < GameConsts.GRID_WIDTH - 1:
+    #                 if block == 0 and line[idx - 1] == 1 and line[idx + 1] == 1:
+    #                     reward -= 1
+    #             if idx == 0 and block == 0 and line[1] == 1:
+    #                 reward -= 1
+    #             if idx == GameConsts.GRID_WIDTH and block == 0 and line[9] == 1:
+    #                 reward -= 1
+    #     return reward
 
     @staticmethod
-    def helper_reward_negative(state) -> int:
+    def helper_reward(taken_positions) -> int:
         reward = 0
-        state = state.tolist()
-        for line in state:
-            for idx, block in enumerate(line):
-                if 1 <= idx < GameConsts.GRID_WIDTH - 1:
-                    if block == 0 and line[idx - 1] == 1 and line[idx + 1] == 1:
-                        reward -= 1
-                if idx == 0 and block == 0 and line[1] == 1:
-                    reward -= 1
-                if idx == GameConsts.GRID_WIDTH and block == 0 and line[9] == 1:
-                    reward -= 1
-        return reward
+        highest_line = GameConsts.GRID_HEIGHT
+        for pos in taken_positions:
+            if pos[1] < highest_line:
+                highest_line = pos[1]
+                reward = GameConsts.GRID_HEIGHT - highest_line
+        return -reward // 2
 
     def train(self, num_steps: int = 10000, batch_size: int = 1024,
               learning_rate: float = 0.01, y: float = 0.9,
               start_e: float = 1.0, end_e: float = 0.001,
               start_max_step: int = 10000, exploration_steps: int = 2500, save_name: str = None):
 
-        fps = 2000
+        fps = 5000
         global start_time
 
         env = Environment()
@@ -128,9 +138,9 @@ class Agent:
 
                 if env.game_over:
                     self.sum_of_scores += env.score
-                    reward = -10
+                    reward = -20
                 else:
-                    reward = env.score - score + Agent.helper_reward_positive(state) + Agent.helper_reward_negative(state)
+                    reward = env.score - score + Agent.helper_reward(env.screen.taken_positions)
 
                 state_next = env.get_state()
                 experience_buffer.add(state, action.value, reward, state_next, env.game_over)
