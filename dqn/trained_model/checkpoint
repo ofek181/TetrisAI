@@ -1,0 +1,2 @@
+model_checkpoint_path: "C:\\Projects\\TetrisAI\\dqn\\trained_model\\2.0"
+all_model_checkpoint_paths: "C:\\Projects\\TetrisAI\\dqn\\trained_model\\2.0"
