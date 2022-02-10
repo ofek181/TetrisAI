@@ -30,8 +30,8 @@ class Neat:
 
 
 def main():
-    # Neat.train()
-    Neat.test()
+    Neat.train()
+    # Neat.test()
 
 
 if __name__ == '__main__':
