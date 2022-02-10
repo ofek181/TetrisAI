@@ -1,14 +1,14 @@
-import random
+import os
+import neat
 import pygame
-import genetic_nn
 import sys
 import pickle
-import math
 from time import sleep
-from random import randrange
+from operator import itemgetter
 from tetris.api import Environment
 from consts import GameConsts, Action
 
+ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__)))
 global generation
 
 
@@ -16,8 +16,33 @@ class NeatAI:
     """
         A class implementing the NEAT algorithm on Tetris.
         ----------------------------
-    # TODO finish docstring
     """
+    @staticmethod
+    def helper_reward_positive(state) -> int:
+        reward = 0
+        state = state.tolist()
+        for line in state:
+            max_1 = 1
+            count = 0
+            for idx in range(len(line) - 1):
+                item = line[idx]
+                item_next = line[idx + 1]
+                if item == 1 and item_next == 1:
+                    max_1 += 1
+                    if max_1 > count:
+                        count = max_1
+                else:
+                    max_1 = 1
+            if count > 8:
+                reward += 4
+            elif count > 7:
+                reward += 3
+            elif count > 6:
+                reward += 2
+            elif count > 5:
+                reward += 1
+        return reward
+
     @staticmethod
     def eval_genomes(genomes, config):
         """
@@ -38,14 +63,12 @@ class NeatAI:
             genome.fitness = 0
             network = neat.nn.FeedForwardNetwork.create(genome, config)
             neural_networks.append(network)
-            balls.append(Ball(x_vel=random.randint(1, 4), y_vel=randrange(-2, 2)))
-            paddles.append(Paddle(x_pos=50, y_pos=DisplayConsts.SCREEN_HEIGHT//2))
+            tetris.append(Environment())
             genes.append(genome)
 
         # game loop for each generation
-        while len(balls) > 0:
+        while len(tetris) > 0:
             # game display and event handling
-            display.draw_training(static_paddle=static_paddle, paddles=paddles, balls=balls)
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
@@ -54,163 +77,96 @@ class NeatAI:
                     if event.key == pygame.K_ESCAPE:
                         pygame.event.post(pygame.event.Event(pygame.QUIT))
 
-            # move the balls and check collisions
-            for index, ball in enumerate(balls):
-                ball.move()
-                new_vel = Physics.calc_ball_velocity(ball, paddles[index], static_paddle)
-                ball.x_vel, ball.y_vel = new_vel.x_vel, new_vel.y_vel
+            # handle game over
+            for idx, game in enumerate(tetris):
+                if game.game_over:
+                    genes[idx].fitness += NeatAI.helper_reward_positive(game.get_state())
+                    genes[idx].fitness -= 50
+                    neural_networks.pop(idx)
+                    genes.pop(idx)
+                    tetris.pop(idx)
 
-            # remove paddle and ball if the ball is out of screen
-            for index, ball in enumerate(balls):
-                if ball.x_pos <= 0:
-                    genes[index].fitness -= 5
-                    neural_networks.pop(index)
-                    genes.pop(index)
-                    balls.pop(index)
-                    paddles.pop(index)
+            # reinforce the winning environments for each living frame
+            for idx, game in enumerate(tetris):
+                genes[idx].fitness += 0.2
+                if len(game.screen.is_row_filled()) > 0:
+                    genes[idx].fitness += game.screen.get_score(len(game.screen.is_row_filled()))
 
-            # reinforce the winning paddles for each living frame
-            for index, paddle in enumerate(paddles):
-                genes[index].fitness += 0.1
-                output = neural_networks[index].activate((balls[index].x_vel, balls[index].y_vel,
-                                                         balls[index].x_pos, balls[index].y_pos,
-                                                         paddle.x_pos, paddle.y_pos))
+                output = neural_networks[idx].activate(game.get_data())
 
-                # move paddle up
-                if output[0] >= 0.5:
-                    paddle.move(-paddle.y_vel)
-
-                # move paddle down
-                if output[0] <= -0.5:
-                    paddle.move(paddle.y_vel)
-
-                # do nothing
-                if -0.5 < output[0] < 0.5:
-                    continue
+                index, element = max(enumerate(output), key=itemgetter(1))
+                if idx == 0:
+                    game.play(Action(index), 1000, False)
+                else:
+                    game.play(Action(index), 1000, True)
 
     @staticmethod
-    def test(config_path, genome_path="pongAI/winner.pkl"):
+    def test(config_path, genome_path=ROOT_DIR+"\\winner.pickle"):
         """
-            Loads the winner network and runs the flappy bird game
+            Loads the winner network and runs game.
             :param
                 config_file: location of config file.
                 genome_path: winner network.
             :return:
                 None
-            """
+        """
         # Load NEAT config
-        config = genetic_nn.config.Config(genetic_nn.DefaultGenome, genetic_nn.DefaultReproduction, genetic_nn.DefaultSpeciesSet,
-                                          genetic_nn.DefaultStagnation, config_path)
+        config = neat.config.Config(neat.DefaultGenome, neat.DefaultReproduction, neat.DefaultSpeciesSet,
+                                    neat.DefaultStagnation, config_path)
 
         # Unpickle saved winner
         with open(genome_path, "rb") as f:
             genome = pickle.load(f)
 
         # initialization
-        ball = Ball()
-        ai_paddle = Paddle(x_pos=50, y_pos=DisplayConsts.SCREEN_HEIGHT // 2)
-        human_paddle =  Paddle(x_pos=DisplayConsts.SCREEN_WIDTH - 50,
-                               y_pos=DisplayConsts.SCREEN_HEIGHT // 2)
-        ai_score = 0
-        human_score = 0
-        display = Display()
-        neural_network = genetic_nn.nn.FeedForwardNetwork.create(genome, config)
+        tetris = Environment()
+        neural_network = neat.nn.FeedForwardNetwork.create(genome, config)
 
         while True:
-            # game display and event handling
-            display.draw_objects(paddle_left=ai_paddle, paddle_right=human_paddle,
-                                 ball=ball, score_left=ai_score, score_right=human_score)
-
-            # move human paddle
-            human_action = EventHandler.handle_right_events()
-            if human_action == Action.MOVE_UP:
-                human_paddle.move(-human_paddle.y_vel)
-            if human_action == Action.MOVE_DOWN:
-                human_paddle.move(human_paddle.y_vel)
-
             # quit the game if needed
-            if human_action == Action.QUIT:
-                pygame.event.post(pygame.event.Event(pygame.QUIT))
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE):
+                    pygame.display.quit()
+                    quit()
 
-            # move ai paddle
-            output = neural_network.activate((ball.x_vel, ball.y_vel,
-                                              ball.x_pos, ball.y_pos,
-                                              ai_paddle.x_pos, ai_paddle.y_pos))
-            # ai move paddle up
-            if output[0] >= 0.5:
-                ai_paddle.move(-ai_paddle.y_vel)
-
-            # move paddle down
-            if output[0] <= -0.5:
-                ai_paddle.move(ai_paddle.y_vel)
-
-            # accelerate the ball if action occurred for the first time
-            if human_action != Action.NO_ACTION:
-                if ball.x_vel == 0 and ball.y_vel == 0:
-                    direction = randrange(start=-1, stop=1)
-                    ball.x_vel = math.copysign(BallConsts.BALL_STARTING_VELOCITY_X, direction)
-
-            # move the ball
-            ball.move()
-
-            # check for intersections
-            new_vel = Physics.calc_ball_velocity(ball=ball, paddle_left=ai_paddle, paddle_right=human_paddle)
-            ball.x_vel, ball.y_vel = new_vel.x_vel, new_vel.y_vel
-
-            # if ai scored
-            if Physics.is_score(ball)[0]:
-                ai_score += 1
-                ball = Ball()
-                ai_paddle = Paddle(x_pos=50, y_pos=DisplayConsts.SCREEN_HEIGHT // 2)
-                human_paddle = Paddle(x_pos=DisplayConsts.SCREEN_WIDTH - 50,
-                                      y_pos=DisplayConsts.SCREEN_HEIGHT // 2)
-            # if human scored
-            if Physics.is_score(ball)[1]:
-                human_score += 1
-                ball = Ball()
-                ai_paddle = Paddle(x_pos=50, y_pos=DisplayConsts.SCREEN_HEIGHT // 2)
-                human_paddle = Paddle(x_pos=DisplayConsts.SCREEN_WIDTH - 50,
-                                      y_pos=DisplayConsts.SCREEN_HEIGHT // 2)
+            output = neural_network.activate(tetris.get_data())
+            index, element = max(enumerate(output), key=itemgetter(1))
+            tetris.play(Action(index), 30)
 
             # check if game is over
-            if human_score == GameConsts.MAX_SCORE:
-                display.show_winner("Human wins!")
-                sleep(3)
-                break
-
-            if ai_score == GameConsts.MAX_SCORE:
-                display.show_winner("AI wins!")
+            if tetris.game_over:
+                print("game over")
                 sleep(3)
                 break
 
     @staticmethod
     def train(config_file):
         """
-            Runs the NEAT algorithm to learn how to play flappy bird.
+            Runs the NEAT algorithm to learn how to play.
             :param
                 config_file: location of config file
             :return:
                 saves the defined winner in a pkl file
-            """
+        """
         global generation
         generation = 0
         # Load configuration.
-        config = genetic_nn.Config(genetic_nn.DefaultGenome, genetic_nn.DefaultReproduction,
-                                   genetic_nn.DefaultSpeciesSet, genetic_nn.DefaultStagnation,
-                                   config_file)
+        config = neat.Config(neat.DefaultGenome, neat.DefaultReproduction,
+                             neat.DefaultSpeciesSet, neat.DefaultStagnation,
+                             config_file)
 
         # Create the population, which is the top-level object for a NEAT run.
-        p = genetic_nn.Population(config)
+        p = neat.Population(config)
 
         # Add a stdout reporter to show progress in the terminal.
-        p.add_reporter(genetic_nn.StdOutReporter(True))
-        stats = genetic_nn.StatisticsReporter()
+        p.add_reporter(neat.StdOutReporter(True))
+        stats = neat.StatisticsReporter()
         p.add_reporter(stats)
 
-        # Run for up to 100 generations.
-        winner = p.run(NeatAI.eval_genomes, 100)
+        # Run for up to 1000 generations.
+        winner = p.run(NeatAI.eval_genomes, 1000)
 
-        with open("pongAI/winner.pkl", "wb") as f:
+        with open("winner.pickle", "wb") as f:
             pickle.dump(winner, f)
             f.close()
 
