@@ -80,17 +80,15 @@ class NeatAI:
             # handle game over
             for idx, game in enumerate(tetris):
                 if game.game_over:
-                    genes[idx].fitness += NeatAI.helper_reward_positive(game.get_state())
-                    genes[idx].fitness -= 50
+                    genes[idx].fitness -= 100
                     neural_networks.pop(idx)
                     genes.pop(idx)
                     tetris.pop(idx)
 
             # reinforce the winning environments for each living frame
             for idx, game in enumerate(tetris):
-                genes[idx].fitness += 0.2
-                if len(game.screen.is_row_filled()) > 0:
-                    genes[idx].fitness += game.screen.get_score(len(game.screen.is_row_filled()))
+                genes[idx].fitness += 0.01
+                genes[idx].fitness += game.screen.get_score(len(game.screen.is_row_filled()))
 
                 output = neural_networks[idx].activate(game.get_data())
 
@@ -164,7 +162,7 @@ class NeatAI:
         p.add_reporter(stats)
 
         # Run for up to 1000 generations.
-        winner = p.run(NeatAI.eval_genomes, 1000)
+        winner = p.run(NeatAI.eval_genomes, 10000)
 
         with open("winner.pickle", "wb") as f:
             pickle.dump(winner, f)
