@@ -50,55 +50,46 @@ class Agent:
             print("Episode: {0} out of: {1} Episodes, Time: {2}".format(i, num_steps, time_difference))
             start_time = datetime.now()
 
-    # @staticmethod
-    # def helper_reward(state) -> int:
-    #     reward = 0
-    #     state = state.tolist()
-    #     for idx, line in enumerate(state):
-    #         idx += 1
-    #         new_reward = line.count(1) * idx // GameConsts.GRID_HEIGHT
-    #         if new_reward > reward:
-    #             reward = new_reward
-    #     return reward
-
-    # @staticmethod
-    # def helper_reward_positive(state) -> int:
-    #     reward = 0
-    #     state = state.tolist()
-    #     for line in state:
-    #         if line.count(1) >= 6:
-    #             reward += 1
-    #     return reward * 3
-    #
-    # @staticmethod
-    # def helper_reward_negative(state) -> int:
-    #     reward = 0
-    #     state = state.tolist()
-    #     for line in state:
-    #         for idx, block in enumerate(line):
-    #             if 1 <= idx < GameConsts.GRID_WIDTH - 1:
-    #                 if block == 0 and line[idx - 1] == 1 and line[idx + 1] == 1:
-    #                     reward -= 1
-    #             if idx == 0 and block == 0 and line[1] == 1:
-    #                 reward -= 1
-    #             if idx == GameConsts.GRID_WIDTH and block == 0 and line[9] == 1:
-    #                 reward -= 1
-    #     return reward
+    @staticmethod
+    def helper_reward_positive(state) -> int:
+        reward = 0
+        state = state.tolist()
+        for line in state:
+            max_1 = 1
+            count = 0
+            for idx in range(len(line) - 1):
+                item = line[idx]
+                item_next = line[idx + 1]
+                if item == 1 and item_next == 1:
+                    max_1 += 1
+                    if max_1 > count:
+                        count = max_1
+                else:
+                    max_1 = 1
+            if count > 8:
+                reward += 4
+            elif count > 7:
+                reward += 3
+            elif count > 6:
+                reward += 2
+            elif count > 5:
+                reward += 1
+        return reward
 
     @staticmethod
-    def helper_reward(taken_positions) -> int:
+    def helper_reward_negative(taken_positions) -> int:
         reward = 0
         highest_line = GameConsts.GRID_HEIGHT
         for pos in taken_positions:
             if pos[1] < highest_line:
                 highest_line = pos[1]
                 reward = GameConsts.GRID_HEIGHT - highest_line
-        return -reward // 2
+        return -reward
 
-    def train(self, num_steps: int = 10000, batch_size: int = 1024,
+    def train(self, num_steps: int = 50000, batch_size: int = 1024,
               learning_rate: float = 0.01, y: float = 0.9,
               start_e: float = 1.0, end_e: float = 0.001,
-              start_max_step: int = 10000, exploration_steps: int = 2500, save_name: str = None):
+              start_max_step: int = 10000, exploration_steps: int = 20000, save_name: str = None):
 
         fps = 5000
         global start_time
@@ -140,7 +131,8 @@ class Agent:
                     self.sum_of_scores += env.score
                     reward = -20
                 else:
-                    reward = env.score - score + Agent.helper_reward(env.screen.taken_positions)
+                    reward = env.score - score + Agent.helper_reward_negative(env.screen.taken_positions) +\
+                             Agent.helper_reward_positive(state)
 
                 state_next = env.get_state()
                 experience_buffer.add(state, action.value, reward, state_next, env.game_over)
@@ -216,9 +208,9 @@ class Agent:
 
 def main():
     agent = Agent(max_step=50000)
-    agent.train(save_name="1.0")
-    # agent.load_model("1.0")
-    # agent.test()
+    # agent.train(save_name="2.0")
+    agent.load_model("1.0")
+    agent.test()
 
 
 if __name__ == '__main__':
