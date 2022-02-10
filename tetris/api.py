@@ -25,6 +25,7 @@ class Environment:
 
         self.current_piece = Piece(5, 0, self.current_shape_idx)
         self.next_piece = Piece(3, 3, self.next_shape_idx)
+        self.get_next_piece = False
 
     def reset(self, fps) -> None:
         """
@@ -91,7 +92,7 @@ class Environment:
             pass
 
     def play(self, action: Action, fps: int, disable_graphics: bool = False) -> None:
-        get_next_piece = False
+        self.get_next_piece = False
         self.screen.update_grid()
 
         # implements gravity.
@@ -109,16 +110,16 @@ class Environment:
         self.current_piece.y += 1
         for pos in self.current_piece.decode_shape():
             if pos in self.screen.taken_positions:
-                get_next_piece = True
+                self.get_next_piece = True
 
-        if not get_next_piece:
+        if not self.get_next_piece:
             for pos in self.current_piece.decode_shape():
                 if pos[1] >= GameConsts.GRID_HEIGHT:
-                    get_next_piece = True
+                    self.get_next_piece = True
         self.current_piece.y -= 1
 
         # handles the event of a collision and gets a new piece into the grid.
-        if get_next_piece:
+        if self.get_next_piece:
             for pos in self.current_piece.decode_shape():
                 self.screen.taken_positions[pos] = self.current_piece.color
             self.current_shape_idx = self.next_shape_idx
