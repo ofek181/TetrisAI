@@ -10,8 +10,8 @@ class DeepQNetwork:
 
 		conv_layer_1 = tf.keras.layers.Conv2D(
 			filters=8,
-			kernel_size=(2, 2),
-			strides=(1, 1),
+			kernel_size=(4, 4),
+			strides=(2, 2),
 			activation='relu',
 			padding="same",
 			input_shape=input_shape)(self.input)
@@ -25,11 +25,11 @@ class DeepQNetwork:
 
 		conv_2_flat = tf.keras.layers.Flatten()(conv_layer_2)
 
-		hidden = tf.keras.layers.Dense(
-			units=64,
+		hidden1 = tf.keras.layers.Dense(
+			units=128,
 			activation='relu')(conv_2_flat)
 
-		self.output_Q = tf.keras.layers.Dense(units=4)(hidden)
+		self.output_Q = tf.keras.layers.Dense(units=4)(hidden1)
 
 		# Predict
 		self.predict_action = tf.argmax(self.output_Q, 1)
