@@ -47,6 +47,27 @@ class Environment:
 
         return numpy.asarray(state)
 
+    def get_data(self) -> list:
+        state = [[0 for _ in range(GameConsts.GRID_WIDTH)] for _ in range(GameConsts.GRID_HEIGHT)]
+
+        for y in range(len(self.screen.grid)):
+            for x in range(len(self.screen.grid[y])):
+                if self.screen.grid[y][x] != GameConsts.GRID_FILL:
+                    state[y][x] = 1
+
+        flat_list = []
+        for sublist in state:
+            for item in sublist:
+                flat_list.append(item)
+
+        flat_list.append(self.current_shape_idx)
+        flat_list.append(self.current_piece.y)
+        flat_list.append(self.current_piece.x)
+        flat_list.append(self.current_piece.rotation)
+        flat_list.append(self.next_shape_idx)
+
+        return flat_list
+
     def _step(self, action) -> None:
         """
             Step function where the user (AI) can enter an action of play.
@@ -69,7 +90,7 @@ class Environment:
         if action == Action.IDLE:
             pass
 
-    def play(self, action: Action, fps: int) -> None:
+    def play(self, action: Action, fps: int, disable_graphics: bool = False) -> None:
         get_next_piece = False
         self.screen.update_grid()
 
@@ -121,5 +142,6 @@ class Environment:
             # self.reset()
 
         # refreshes the display with respect to the FPS of the game.
-        self.display.draw_screen(self.screen.grid, self.next_piece.decode_shape(),
-                                 self.next_piece.color, self.score, fps)
+        if not disable_graphics:
+            self.display.draw_screen(self.screen.grid, self.next_piece.decode_shape(),
+                                     self.next_piece.color, self.score, fps)
