@@ -48,6 +48,8 @@ class Ai:
     def check_height(simulated_grid: list) -> int:
         """
             Checks the height of the new tower simulated by the drop function.
+            height = Grid_Height is the best value possible.
+            height = 0 is the worst value possible.
         """
         max_height = GameConsts.GRID_HEIGHT
 
@@ -67,6 +69,7 @@ class Ai:
     def check_holes(simulated_grid: list) -> int:
         """
             Checks the number of holes after a simulated drop.
+            holes = 0 is the best value possible.
         """
         holes = 0
 
@@ -86,6 +89,7 @@ class Ai:
     def check_bumpiness(simulated_grid: list) -> int:
         """
             Checks to see the bumpiness of the grid.
+            bumpiness = 0 is the best value possible.
         """
         heights = [GameConsts.GRID_HEIGHT] * GameConsts.GRID_WIDTH
         bumpiness = 0
@@ -102,6 +106,19 @@ class Ai:
             bumpiness += diff
 
         return bumpiness
+
+    @staticmethod
+    def compute_score_for_move(max_height: int, holes: int, bumpiness: int) -> int:
+        """
+        Computes the score of a single move based on the maximum height, holes and bumpiness it leaves.
+            :param max_height: we need to maximize this parameter (higher height means lower value)
+            :param holes: we need to minimize this parameters (a lot of holes are bad)
+            :param bumpiness: we need to minimize this (greater bumpiness is bad)
+            :return: score function of a single move, higher score value means a better move
+                     score = grid.height is the best score possible.
+        """
+        score = max_height - holes - bumpiness
+        return score
 
     def choose_best_action(self) -> None:
         """
