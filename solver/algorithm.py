@@ -167,7 +167,7 @@ class Ai:
             heights.append(h)
 
         for x in range(GameConsts.GRID_WIDTH - 1):
-            if heights[x] - heights[x + 1] >= 4:
+            if heights[x] - heights[x + 1] >= 2:
                 pillars += 1
 
         return pillars
@@ -190,11 +190,11 @@ class Ai:
 
     @staticmethod
     def get_combs():
-        combs = product([0, 1, 2, 3, 4, 5, 6, 7, 8, 9], repeat=3)
+        combs = product([0, 0.5, 1, 2, 2.5, 3, 3.2, 3.8, 4.5, 5, 6, 6.5, 7.2, 8, 9, 10, 11], repeat=3)
         return combs
 
     @staticmethod
-    def compute_cost_for_move(a, b, c, height: int, holes: int, bumpiness: int, pillars: int, max_hole: int, lines: int) -> float:
+    def compute_cost_for_move(a, b, c, d, e, height: int, holes: int, bumpiness: int, pillars: int, max_hole: int, lines: int) -> float:
         """
         Computes the score of a single move based on the maximum height, holes and bumpiness it leaves.
             :param height: we need to minimize this parameter.
@@ -207,11 +207,11 @@ class Ai:
         """
         # a, b, c, d, e, f = 1.2, 2, 0, 4, 10, 20
         # cost = a * height + b * holes + c * bumpiness + d * pillars + e * max_hole - f * lines
-        f = {0: 0, 1: 50, 2: 200, 3: 500, 4: 1200}
-        cost = a * height + b * holes + c * bumpiness + 0 * pillars + 0 * max_hole - f[lines]
+        f = {0: 0, 1: 100, 2: 200, 3: 500, 4: 1200}
+        cost = a * height + b * holes + c * bumpiness + d * pillars + e * max_hole - f[lines]
         return cost
 
-    def best_final_state(self, a, b, c) -> tuple:
+    def best_final_state(self, a, b, c, d, e) -> tuple:
         """
             Calculates the best final state based on the state with the lowest cost.
         """
@@ -227,7 +227,7 @@ class Ai:
                     pillars = self.check_pillars(simulated_taken)
                     max_hole = self.maximum_hole(simulated_taken)
                     lines = self.check_lines(simulated_taken)
-                    cost = self.compute_cost_for_move(a, b, c, height, holes, bumpiness, pillars, max_hole, lines)
+                    cost = self.compute_cost_for_move(a, b, c, d, e, height, holes, bumpiness, pillars, max_hole, lines)
                     if cost < min_cost:
                         best_state = x, rotation
                         min_cost = cost
@@ -239,7 +239,7 @@ class Ai:
         """
         fps = 30
         self.tetris.reset(fps)
-        desired_x_pos, desired_rotation = self.best_final_state(0, 0, 0)
+        desired_x_pos, desired_rotation = self.best_final_state(9, 7.2, 0.3, 1, 18)
         while True:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE):
@@ -257,7 +257,7 @@ class Ai:
             self.tetris.play(action, fps)
 
             if self.tetris.get_next_piece:
-                desired_x_pos, desired_rotation = self.best_final_state(0, 0, 0)
+                desired_x_pos, desired_rotation = self.best_final_state(9, 7.2, 0.3, 1, 18)
 
             if self.tetris.game_over:
                 self.tetris.display.draw_game_over(self.tetris.score, "AI")
@@ -274,11 +274,11 @@ class Ai:
         """
         fps = 1000
         self.tetris.reset(fps)
-        desired_x_pos, desired_rotation = self.best_final_state(0, 0, 0)
+        desired_x_pos, desired_rotation = self.best_final_state(0, 0, 0, 0, 0)
         combs = self.get_combs()
         for idx, comb in enumerate(combs):
             if idx % 10 == 0:
-                print(str(idx) + ' out of: ' + str(10 ** 3) + ', ' + str(100 * idx // 10 ** 3) + '%')
+                print(str(idx) + ' out of: ' + str(17 ** 3) + ', ' + str(100 * idx // 17 ** 3) + '%')
             while not self.tetris.game_over:
                 for event in pygame.event.get():
                     if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE):
@@ -296,20 +296,58 @@ class Ai:
                 self.tetris.play(action, fps)
 
                 if self.tetris.get_next_piece:
-                    desired_x_pos, desired_rotation = self.best_final_state(comb[0], comb[1], comb[2])
+                    desired_x_pos, desired_rotation = self.best_final_state(comb[0], comb[1], comb[2], comb[3], comb[4])
 
-            if self.tetris.score >= 1000:
+            if self.tetris.score >= 4000:
                 f = open("parameters.txt", "x")
-                f.write("a: " + str(comb[0]) + "\nb: " + str(comb[1])
-                        + "\nc: " + str(comb[2]) + "\nd: " + str(comb[3]) + "\ne: " + str(comb[4]))
+                f.write("a: " + str(comb[0]) + "\nb: " + str(comb[1]) + "\nc: "
+                        + str(comb[2]) + "\nd: " + str(comb[3]) + "\ne: " + str(comb[4])
+                        + "\nscore: " + str(self.tetris.score))
                 f.close()
                 break
+
             self.tetris.reset(fps)
+
+    def plot_scores(self) -> None:
+        """
+            solves for the best position of a single piece
+        """
+        fps = 1000
+        scores = []
+        self.tetris.reset(fps)
+        desired_x_pos, desired_rotation = self.best_final_state(9, 7.2, 0.3, 1, 18)
+        for i in range(1000):
+            while not self.tetris.game_over:
+                for event in pygame.event.get():
+                    if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE):
+                        pygame.display.quit()
+                        quit()
+                if desired_x_pos > self.tetris.current_piece.x:
+                    action = Action.LEFT
+                elif desired_x_pos < self.tetris.current_piece.x:
+                    action = Action.RIGHT
+                elif desired_rotation != self.tetris.current_piece.rotation:
+                    action = Action.UP
+                else:
+                    action = Action.IDLE
+
+                self.tetris.play(action, fps)
+
+                if self.tetris.get_next_piece:
+                    desired_x_pos, desired_rotation = self.best_final_state(9, 7.2, 0.3, 1, 18)
+
+            scores.append(self.tetris.score)
+            self.tetris.reset(fps)
+
+        print(scores)
+        print(max(scores))
 
 
 def main():
     ai = Ai()
     ai.find_optimal_set()
+    # ai.solve_puzzle()
+    # ai.plot_scores()
 
 
 if __name__ == '__main__':
