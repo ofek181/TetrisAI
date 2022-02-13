@@ -43,10 +43,17 @@ class Game(ABCGame):
         """
         self.display = Display()
         self.screen = Screen()
-        self.current_shape_idx, self.next_shape_idx = random.randint(0, 6), random.randint(0, 6)
-        while self.current_shape_idx == self.next_shape_idx:
-            self.next_shape_idx = random.randint(0, 6)
+        self.ungrabbed_bag = [0, 1, 2, 3, 4, 5, 6]
+        self.current_shape_idx = self.seven_bag()
+        self.next_shape_idx = self.seven_bag()
         self.score = 0
+
+    def seven_bag(self) -> int:
+        if len(self.ungrabbed_bag) == 0:
+            self.ungrabbed_bag = [0, 1, 2, 3, 4, 5, 6]
+        shape = random.choice(self.ungrabbed_bag)
+        self.ungrabbed_bag.remove(shape)
+        return shape
 
     def play(self, audio: bool = True) -> None:
         """
@@ -156,10 +163,7 @@ class Game(ABCGame):
                 for pos in current_piece.decode_shape():
                     self.screen.taken_positions[pos] = current_piece.color
                 self.current_shape_idx = self.next_shape_idx
-                next_idx = random.randint(0, 6)
-                while self.current_shape_idx == next_idx:
-                    next_idx = random.randint(0, 6)
-                self.next_shape_idx = next_idx
+                self.next_shape_idx = self.seven_bag()
                 current_piece = Piece(5, 0, self.current_shape_idx)
                 next_piece = Piece(3, 3, self.next_shape_idx)
                 get_next_piece = False
