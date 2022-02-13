@@ -26,7 +26,7 @@ class Ai:
         flatten_valid = [item for sublist in valid for item in sublist]
         for loc in positions:
             if loc not in flatten_valid:
-                if loc[1] >= 2:
+                if loc[1] >= 4:
                     return False
                 if loc[0] > GameConsts.GRID_WIDTH or loc[0] < 0:
                     return False
@@ -48,20 +48,29 @@ class Ai:
 
         return simulated_grid
 
-    def simulate_drop(self, x: int, rotation: int) -> tuple:
+    def simulate_drop(self, x: int, rotation: int, x_next: int, rotation_next: int, look_ahead : bool) -> tuple:
         """
             Simulates a drop of a piece.
         """
         simulated_grid = copy(self.tetris.screen.grid)
         current_piece = copy(self.tetris.current_piece)
+        next_piece = copy(self.tetris.next_piece)
         simulated_taken = copy(self.tetris.screen.taken_positions)
         current_piece.x = x
         current_piece.rotation = rotation
         out = False
 
+        if look_ahead:
+            next_piece.x = x_next
+            next_piece.rotation = rotation_next
+
         for pos in current_piece.decode_shape():
             if pos[0] < 0 or pos[0] >= GameConsts.GRID_WIDTH:
                 out = True
+        if look_ahead:
+            for pos in next_piece.decode_shape():
+                if pos[0] < 0 or pos[0] >= GameConsts.GRID_WIDTH:
+                    out = True
 
         if not out:
             while self.check_valid_position(current_piece.decode_shape(), simulated_grid):
@@ -70,6 +79,16 @@ class Ai:
 
             for pos in current_piece.decode_shape():
                 simulated_taken[pos] = current_piece.color
+
+            if look_ahead:
+                Ai.update_grid(simulated_taken)
+
+                while self.check_valid_position(next_piece.decode_shape(), simulated_grid):
+                    next_piece.y += 1
+                next_piece.y -= 1
+
+                for pos in next_piece.decode_shape():
+                    simulated_taken[pos] = next_piece.color
 
         return simulated_taken, out
 
@@ -95,7 +114,7 @@ class Ai:
             h = Ai.get_height_of_column(x, simulated_taken)
             heights.append(GameConsts.GRID_HEIGHT - h)
 
-        return max(heights)
+        return sum(heights)
 
     @staticmethod
     def check_holes(simulated_taken: dict) -> int:
@@ -213,30 +232,43 @@ class Ai:
             Calculates the best final state based on the state with the lowest cost.
         """
         min_cost = float('inf')
+        rot_range_next = len(self.tetris.next_piece.shape)
+        x_range_next = GameConsts.GRID_WIDTH + 1
         best_state = 0, 0
-        for rotation in range(len(self.tetris.current_piece.shape)):
-            for x in range(GameConsts.GRID_WIDTH + 1):
-                simulated_taken, out = self.simulate_drop(x, rotation)
-                if not out:
-                    height = self.check_height(simulated_taken)
-                    holes = self.check_holes(simulated_taken)
-                    bumpiness = self.check_bumpiness(simulated_taken)
-                    pillars = self.check_pillars(simulated_taken)
-                    max_hole = self.maximum_hole(simulated_taken)
-                    lines = self.check_lines(simulated_taken)
-                    cost = self.compute_cost_for_move(a, b, c, d, height, holes, bumpiness, pillars, max_hole, lines)
-                    if cost < min_cost:
-                        best_state = x, rotation
-                        min_cost = cost
+        look_ahead = False
+        if not look_ahead:
+            rot_range_next, x_range_next = 1, 1
+
+        for rotation_next in range(rot_range_next):
+            for x_next in range(x_range_next):
+                for rotation in range(len(self.tetris.current_piece.shape)):
+                    for x in range(GameConsts.GRID_WIDTH + 1):
+                        simulated_taken, out = self.simulate_drop(x, rotation, x_next, rotation_next, look_ahead)
+                        if not out:
+                            height = self.check_height(simulated_taken)
+                            holes = self.check_holes(simulated_taken)
+                            bumpiness = self.check_bumpiness(simulated_taken)
+                            pillars = self.check_pillars(simulated_taken)
+                            max_hole = self.maximum_hole(simulated_taken)
+                            lines = self.check_lines(simulated_taken)
+                            cost = self.compute_cost_for_move(a, b, c, d, height, holes, bumpiness,
+                                                              pillars, max_hole, lines)
+                            if cost < min_cost:
+                                best_state = x, rotation
+                                min_cost = cost
         return best_state
 
     def solve_puzzle(self) -> None:
         """
             solves for the best position of a single piece
         """
-        fps = 30
+        fps = 20
+        a = 2.5
+        b = 1
+        c = 1
+        d = 4
         self.tetris.reset(fps)
-        desired_x_pos, desired_rotation = self.best_final_state(0.510066, 0.35663, 0.184483, 0.760666)
+        desired_x_pos, desired_rotation = self.best_final_state(a, b, c, d)
         while True:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE):
@@ -254,7 +286,7 @@ class Ai:
             self.tetris.play(action, fps)
 
             if self.tetris.get_next_piece:
-                desired_x_pos, desired_rotation = self.best_final_state(0.510066, 0.35663, 0.184483, 0.760666)
+                desired_x_pos, desired_rotation = self.best_final_state(a, b, c, d)
 
             if self.tetris.game_over:
                 self.tetris.display.draw_game_over(self.tetris.score, "AI")
@@ -274,7 +306,7 @@ class Ai:
         desired_x_pos, desired_rotation = self.best_final_state(0, 0, 0, 0)
         combs = self.get_combs()
         for idx, comb in enumerate(combs):
-            if idx % 1000 == 0:
+            if idx % 100 == 0:
                 print(str(idx) + ' out of: ' + str(10 ** 4) + ', ' + str(100 * idx // 10 ** 4) + '%')
             while not self.tetris.game_over:
                 for event in pygame.event.get():
@@ -345,8 +377,8 @@ class Ai:
 
 def main():
     ai = Ai()
-    ai.find_optimal_set()
-    # ai.solve_puzzle()
+    # ai.find_optimal_set()
+    ai.solve_puzzle()
     # ai.plot_scores()
 
 
