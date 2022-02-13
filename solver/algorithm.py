@@ -81,7 +81,7 @@ class Ai:
                 simulated_taken[pos] = current_piece.color
 
             if look_ahead:
-                Ai.update_grid(simulated_taken)
+                simulated_grid = Ai.update_grid(simulated_taken)
 
                 while self.check_valid_position(next_piece.decode_shape(), simulated_grid):
                     next_piece.y += 1
@@ -235,7 +235,7 @@ class Ai:
         rot_range_next = len(self.tetris.next_piece.shape)
         x_range_next = GameConsts.GRID_WIDTH + 1
         best_state = 0, 0
-        look_ahead = False
+        look_ahead = True
         if not look_ahead:
             rot_range_next, x_range_next = 1, 1
 
