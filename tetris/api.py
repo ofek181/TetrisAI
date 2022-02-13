@@ -17,15 +17,22 @@ class Environment:
         """
         self.display = Display()
         self.screen = Screen()
-        self.current_shape_idx, self.next_shape_idx = random.randint(0, 6), random.randint(0, 6)
-        while self.current_shape_idx == self.next_shape_idx:
-            self.next_shape_idx = random.randint(0, 6)
+        self.ungrabbed_bag = [0, 1, 2, 3, 4, 5, 6]
+        self.current_shape_idx = self.seven_bag()
+        self.next_shape_idx = self.seven_bag()
         self.score = 0
         self.game_over = False
 
         self.current_piece = Piece(5, 0, self.current_shape_idx)
         self.next_piece = Piece(3, 3, self.next_shape_idx)
         self.get_next_piece = False
+
+    def seven_bag(self) -> int:
+        if len(self.ungrabbed_bag) == 0:
+            self.ungrabbed_bag = [0, 1, 2, 3, 4, 5, 6]
+        shape = random.choice(self.ungrabbed_bag)
+        self.ungrabbed_bag.remove(shape)
+        return shape
 
     def reset(self, fps) -> None:
         """
@@ -123,16 +130,14 @@ class Environment:
             for pos in self.current_piece.decode_shape():
                 self.screen.taken_positions[pos] = self.current_piece.color
             self.current_shape_idx = self.next_shape_idx
-            next_idx = random.randint(0, 6)
-            while self.current_shape_idx == next_idx:
-                next_idx = random.randint(0, 6)
-            self.next_shape_idx = next_idx
+            self.next_shape_idx = self.seven_bag()
             self.current_piece = Piece(5, 0, self.current_shape_idx)
             self.next_piece = Piece(3, 3, self.next_shape_idx)
 
             rows = self.screen.is_row_filled()
             self.screen.clear_filled_rows(rows)
             self.score += self.screen.get_score(len(rows))
+
 
         # # checks if the current score is greater than the highest score and saves it.
         # highest_score = self.screen.update_highest_score(self.score)
