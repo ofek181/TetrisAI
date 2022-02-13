@@ -33,6 +33,41 @@ class Ai:
         return True
 
     @staticmethod
+    def is_row_filled(simulated_taken: dict) -> list:
+        """
+            checks if an entire row is filled so the tetris game can clear it.
+        """
+        counter = 0
+        filled_rows = []
+        for y in range(GameConsts.GRID_HEIGHT):
+            for x in range(GameConsts.GRID_WIDTH):
+                if (x, y) in simulated_taken:
+                    counter += 1
+                    if counter == GameConsts.GRID_WIDTH:
+                        filled_rows.append(y)
+            counter = 0
+        return filled_rows
+
+    @staticmethod
+    def clear_filled_rows(simulated_taken: dict, filled_rows: list) -> dict:
+        """
+            clear a row if the said row is already filled.
+            take down all following rows by 1 for each deleted row
+        """
+        filled_rows.sort()
+        for y in filled_rows:
+            for x in range(GameConsts.GRID_WIDTH):
+                del simulated_taken[(x, y)]
+
+        for row in filled_rows:
+            for y in range(row, -1, -1):
+                for x in range(GameConsts.GRID_WIDTH):
+                    if (x, y) in simulated_taken:
+                        simulated_taken[(x, y + 1)] = simulated_taken.pop((x, y))
+
+        return simulated_taken
+
+    @staticmethod
     def update_grid(taken_positions: dict) -> list:
         """
             updates the tetris puzzle grid.
@@ -82,6 +117,8 @@ class Ai:
 
             if look_ahead:
                 simulated_grid = Ai.update_grid(simulated_taken)
+                rows = Ai.is_row_filled(simulated_taken)
+                simulated_taken = Ai.clear_filled_rows(simulated_taken, rows)
 
                 while self.check_valid_position(next_piece.decode_shape(), simulated_grid):
                     next_piece.y += 1
@@ -208,7 +245,7 @@ class Ai:
 
     @staticmethod
     def get_combs():
-        combs = product([1, 2, 3, 4, 5, 6, 7, 8, 9, 10], repeat=4)
+        combs = product([1, 1.5, 2.5, 3, 3.5, 4, 4.5, 5, 6, 7, 7.8, 9], repeat=4)
         return combs
 
     @staticmethod
@@ -263,10 +300,10 @@ class Ai:
             solves for the best position of a single piece
         """
         fps = 20
-        a = 2.5
-        b = 1
-        c = 1
-        d = 4
+        a = 0.5
+        b = 0.35
+        c = 0.2
+        d = 0.8
         self.tetris.reset(fps)
         desired_x_pos, desired_rotation = self.best_final_state(a, b, c, d)
         while True:
@@ -307,7 +344,7 @@ class Ai:
         combs = self.get_combs()
         for idx, comb in enumerate(combs):
             if idx % 100 == 0:
-                print(str(idx) + ' out of: ' + str(10 ** 4) + ', ' + str(100 * idx // 10 ** 4) + '%')
+                print(str(idx) + ' out of: ' + str(12 ** 4) + ', ' + str(100 * idx // 12 ** 4) + '%')
             while not self.tetris.game_over:
                 for event in pygame.event.get():
                     if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE):
@@ -327,7 +364,7 @@ class Ai:
                 if self.tetris.get_next_piece:
                     desired_x_pos, desired_rotation = self.best_final_state(comb[0], comb[1], comb[2], comb[3])
 
-            if self.tetris.score >= 7000:
+            if self.tetris.score >= 6000:
                 print("score: " + str(self.tetris.score) + "!" + " ,with combination: " + str(comb))
                 f = open("parameters.txt", "x")
                 f.write("a: " + str(comb[0]) + "\nb: " + str(comb[1]) + "\nc: " + str(0.04)
@@ -335,7 +372,7 @@ class Ai:
                 f.close()
                 break
 
-            if self.tetris.score >= 3500:
+            if self.tetris.score >= 3000:
                 print("score: " + str(self.tetris.score) + " ,with combination: " + str(comb))
 
             self.tetris.reset(fps)
